@@ -15,20 +15,51 @@ const wpm = ref(0)
 const accuracy = ref(100)
 const totalWords = ref(0)
 const correctWords = ref(0)
+const gameMode = ref<'chinese' | 'english'>('chinese')
 
 let timerInterval: NodeJS.Timeout | null = null
 
-// 词汇库
-const words = [
+// 中文词汇库
+const chineseWords = [
   '编程', '代码', '开发', '网站', '应用', '系统', '数据', '算法',
   '函数', '变量', '循环', '条件', '数组', '对象', '方法', '类',
   '继承', '封装', '多态', '接口', '模块', '组件', '框架', '库',
   '前端', '后端', '数据库', '服务器', '客户端', '响应式', '异步', '同步'
 ]
 
+// 英文词汇库
+const englishWords = [
+  'program', 'code', 'develop', 'website', 'application', 'system', 'data', 'algorithm',
+  'function', 'variable', 'loop', 'condition', 'array', 'object', 'method', 'class',
+  'inheritance', 'encapsulation', 'polymorphism', 'interface', 'module', 'component', 'framework', 'library',
+  'frontend', 'backend', 'database', 'server', 'client', 'responsive', 'async', 'sync',
+  'javascript', 'typescript', 'python', 'java', 'html', 'css', 'react', 'vue',
+  'angular', 'nodejs', 'express', 'mongodb', 'mysql', 'git', 'github', 'docker'
+]
+
+// 获取当前模式的词汇库
+const getCurrentWords = (): string[] => {
+  return gameMode.value === 'chinese' ? chineseWords : englishWords
+}
+
 // 生成新单词
 const generateNewWord = () => {
-  currentWord.value = words[Math.floor(Math.random() * words.length)]
+  const words = getCurrentWords()
+  if (words.length > 0) {
+    const randomIndex = Math.floor(Math.random() * words.length)
+    const selectedWord = words[randomIndex]
+    if (selectedWord) {
+      currentWord.value = selectedWord
+    }
+  }
+}
+
+// 切换游戏模式
+const switchMode = (mode: 'chinese' | 'english') => {
+  if (!gameRunning.value) {
+    gameMode.value = mode
+    generateNewWord()
+  }
 }
 
 // 检查输入
@@ -162,11 +193,36 @@ onUnmounted(() => {
   <div class="typing-game">
     <!-- 返回按钮 -->
     <NuxtLink to="/" class="back-button">
-      返回主页
+      🏠 返回主页
     </NuxtLink>
 
     <div class="game-container">
       <h1 class="game-title">打字挑战</h1>
+      
+      <!-- 模式选择 -->
+      <div class="mode-selector" v-if="!gameRunning">
+        <div class="mode-buttons">
+          <button 
+            class="mode-button" 
+            :class="{ active: gameMode === 'chinese' }"
+            @click="switchMode('chinese')"
+          >
+            中文模式
+          </button>
+          <button 
+            class="mode-button" 
+            :class="{ active: gameMode === 'english' }"
+            @click="switchMode('english')"
+          >
+            英文模式
+          </button>
+        </div>
+      </div>
+      
+      <!-- 当前模式显示 -->
+      <div class="current-mode" v-if="gameRunning">
+        <span class="mode-indicator">当前模式：{{ gameMode === 'chinese' ? '中文' : '英文' }}</span>
+      </div>
       
       <!-- 统计信息 -->
       <div class="stats">
@@ -216,6 +272,7 @@ onUnmounted(() => {
       <div class="instructions">
         <h3>游戏说明</h3>
         <ul>
+          <li>选择中文或英文打字模式</li>
           <li>在输入框中输入显示的词汇</li>
           <li>输入完成后按回车键确认</li>
           <li>正确输入获得分数，错误不得分</li>
@@ -241,18 +298,27 @@ onUnmounted(() => {
   position: fixed;
   top: 20px;
   right: 20px;
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.2);
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
   color: white;
-  border-radius: 8px;
+  border-radius: 25px;
   text-decoration: none;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
   font-weight: bold;
+  font-size: 16px;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
   z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .back-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #ff5252, #ff3d00);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
 }
 
 .game-container {
@@ -270,6 +336,52 @@ onUnmounted(() => {
   font-weight: bold;
   margin-bottom: 2rem;
   color: #333;
+}
+
+.mode-selector {
+  margin-bottom: 2rem;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.mode-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 2px solid #667eea;
+  border-radius: 0.5rem;
+  background: white;
+  color: #667eea;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mode-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.mode-button.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.current-mode {
+  margin-bottom: 1rem;
+}
+
+.mode-indicator {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #e7f3ff;
+  color: #667eea;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  font-size: 0.875rem;
 }
 
 .stats {
@@ -419,6 +531,23 @@ onUnmounted(() => {
   .start-button {
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
+  }
+  
+  .mode-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .mode-button {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .back-button {
+    padding: 10px 20px;
+    font-size: 14px;
+    top: 10px;
+    right: 10px;
   }
 }
 </style> 

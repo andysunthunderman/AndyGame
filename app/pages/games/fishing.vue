@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 definePageMeta({
-  layout: 'default'
+  layout: 'game'
 })
 
 // 响应式数据
@@ -332,10 +332,7 @@ onUnmounted(() => {
       <div class="timer-display">时间: {{ timeLeft }}秒</div>
     </div>
     
-    <!-- 返回按钮 -->
-    <NuxtLink to="/" class="back-button">
-      返回主页
-    </NuxtLink>
+
     
     <!-- 游戏说明 -->
     <div class="instructions">
@@ -378,23 +375,7 @@ onUnmounted(() => {
   font-weight: bold;
 }
 
-.back-button {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background 0.3s ease;
-  font-weight: bold;
-  z-index: 10;
-}
 
-.back-button:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
 
 .instructions {
   position: fixed;
@@ -429,9 +410,6 @@ onUnmounted(() => {
     padding: 3px 6px;
   }
   
-  .back-button {
-    padding: 8px 16px;
-    font-size: 14px;
-  }
+
 }
 </style> 

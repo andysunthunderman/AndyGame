@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 definePageMeta({
-  layout: 'default'
+  layout: 'game'
 })
 
 // 游戏配置
@@ -302,10 +302,7 @@ onUnmounted(() => {
 
 <template>
   <div class="minesweeper-game">
-    <!-- 返回按钮 -->
-    <NuxtLink to="/" class="back-button">
-      返回主页
-    </NuxtLink>
+
 
     <!-- 游戏标题 -->
     <h1 class="game-title">扫雷游戏</h1>
@@ -372,23 +369,7 @@ onUnmounted(() => {
   padding: 2rem;
 }
 
-.back-button {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  background: rgba(0, 0, 0, 0.1);
-  color: #333;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background 0.3s ease;
-  font-weight: bold;
-  z-index: 100;
-}
 
-.back-button:hover {
-  background: rgba(0, 0, 0, 0.2);
-}
 
 .game-title {
   font-size: 2.5rem;
@@ -554,5 +535,7 @@ onUnmounted(() => {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
   }
+  
+
 }
 </style> 

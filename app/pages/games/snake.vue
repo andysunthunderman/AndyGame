@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 definePageMeta({
-  layout: 'default'
+  layout: 'game'
 })
 
 // 游戏配置
@@ -57,6 +57,11 @@ const drawGame = () => {
     ctx.stroke()
   }
   
+  // 确保蛇存在且不为空
+  if (!snake || snake.length === 0) {
+    snake = [{ x: 10, y: 10 }]
+  }
+  
   // 移动蛇
   const head = { x: snake[0].x + dx, y: snake[0].y + dy }
   snake.unshift(head)
@@ -99,16 +104,23 @@ const generateFood = () => {
     y: Math.floor(Math.random() * tileCount)
   }
   // 确保食物不会生成在蛇身上
-  while (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
-    food = {
-      x: Math.floor(Math.random() * tileCount),
-      y: Math.floor(Math.random() * tileCount)
+  if (snake && snake.length > 0) {
+    while (snake.some(segment => segment && segment.x === food.x && segment.y === food.y)) {
+      food = {
+        x: Math.floor(Math.random() * tileCount),
+        y: Math.floor(Math.random() * tileCount)
+      }
     }
   }
 }
 
 // 检查游戏结束
 const isGameOver = () => {
+  // 确保蛇存在且不为空
+  if (!snake || snake.length === 0) {
+    return true
+  }
+  
   // 撞墙
   if (snake[0].x < 0 || snake[0].x >= tileCount || 
       snake[0].y < 0 || snake[0].y >= tileCount) {
@@ -117,7 +129,7 @@ const isGameOver = () => {
   
   // 撞到自己
   for (let i = 1; i < snake.length; i++) {
-    if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) {
+    if (snake[i] && snake[0] && snake[i].x === snake[0].x && snake[i].y === snake[0].y) {
       return true
     }
   }
@@ -261,10 +273,7 @@ onUnmounted(() => {
 
 <template>
   <div class="snake-game">
-    <!-- 返回按钮 -->
-    <NuxtLink to="/" class="back-button">
-      返回主页
-    </NuxtLink>
+
 
     <div class="game-container">
       <h1 class="game-title">贪吃蛇游戏</h1>
@@ -325,23 +334,7 @@ onUnmounted(() => {
   font-family: Arial, sans-serif;
 }
 
-.back-button {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  background: rgba(0, 0, 0, 0.1);
-  color: #333;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background 0.3s ease;
-  font-weight: bold;
-  z-index: 100;
-}
 
-.back-button:hover {
-  background: rgba(0, 0, 0, 0.2);
-}
 
 .game-container {
   background: rgba(255, 255, 255, 0.9);
@@ -491,5 +484,7 @@ onUnmounted(() => {
     height: 35px;
     font-size: 1rem;
   }
+  
+
 }
 </style> 

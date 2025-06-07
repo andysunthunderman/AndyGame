@@ -150,6 +150,79 @@ const openManual = () => {
 const closeManual = () => {
   showManual.value = false
 }
+
+// 图片加载错误处理
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  console.error('图片加载失败:', img.src)
+  // 隐藏图片并显示渐变背景
+  img.style.display = 'none'
+  const container = img.parentElement!
+  
+  // 根据游戏类型设置不同的渐变背景
+  const gameId = img.alt?.toLowerCase()
+  let gradient = 'linear-gradient(45deg, #667eea, #764ba2)' // 默认渐变
+  
+  switch(gameId) {
+    case '扫雷游戏':
+      gradient = 'linear-gradient(45deg, #4facfe, #00f2fe)'
+      break
+    case '贪吃蛇':
+      gradient = 'linear-gradient(45deg, #fa709a, #fee140)'
+      break
+    case '深海捕鱼':
+      gradient = 'linear-gradient(45deg, #43e97b, #38f9d7)'
+      break
+    case '打字挑战':
+      gradient = 'linear-gradient(45deg, #667eea, #764ba2)'
+      break
+    case '多人坦克对战':
+      gradient = 'linear-gradient(45deg, #a8edea, #fed6e3)'
+      break
+    case '飞机大战':
+      gradient = 'linear-gradient(45deg, #ff9a9e, #fecfef)'
+      break
+  }
+  
+  container.style.background = gradient
+  container.style.display = 'flex'
+  container.style.alignItems = 'center'
+  container.style.justifyContent = 'center'
+  
+  // 添加游戏图标或文字
+  const icon = document.createElement('div')
+  icon.style.fontSize = '48px'
+  icon.style.color = 'rgba(255, 255, 255, 0.8)'
+  icon.style.fontWeight = 'bold'
+  icon.textContent = getGameIcon(gameId || '')
+  container.appendChild(icon)
+}
+
+// 获取游戏图标
+const getGameIcon = (gameTitle: string) => {
+  switch(gameTitle) {
+    case '扫雷游戏':
+      return '💣'
+    case '贪吃蛇':
+      return '🐍'
+    case '深海捕鱼':
+      return '🎣'
+    case '打字挑战':
+      return '⌨️'
+    case '多人坦克对战':
+      return '🚗'
+    case '飞机大战':
+      return '✈️'
+    default:
+      return '🎮'
+  }
+}
+
+// 图片加载成功处理
+const handleImageLoad = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  console.log('图片加载成功:', img.src)
+}
 </script>
 
 <template>
@@ -194,7 +267,15 @@ const closeManual = () => {
           :key="game.id" 
           class="game-card"
         >
-          <div :class="`game-image ${game.image}`"></div>
+          <div class="game-image-container">
+            <img 
+              :src="`/images/${game.image}.png`" 
+              :alt="game.title"
+              class="game-image"
+              @error="handleImageError"
+              @load="handleImageLoad"
+            >
+          </div>
           <div class="game-content">
             <h2 class="game-title">{{ game.title }}</h2>
             <p class="game-description">{{ game.description }}</p>
@@ -209,10 +290,7 @@ const closeManual = () => {
       </div>
     </div>
 
-    <!-- 页脚 -->
-    <footer class="page-footer">
-      <p>© 2025 游戏集合 - 尽情享受游戏的乐趣！</p>
-    </footer>
+
 
     <!-- 游戏说明书模态框 -->
     <div v-if="showManual" class="modal" @click.self="closeManual">
@@ -412,35 +490,21 @@ const closeManual = () => {
   box-shadow: 0 15px 40px rgba(245, 113, 113, 0.2);
 }
 
-.game-image {
+.game-image-container {
   height: 240px;
-  background-size: cover;
-  background-position: center;
-  background-color: #f3f4f6;
+  background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
-.game-image.minesweeper {
-  background-image: linear-gradient(45deg, #ff6b6b, #feca57);
-}
-
-.game-image.tank {
-  background-image: linear-gradient(45deg, #48dbfb, #0abde3);
-}
-
-.game-image.plane {
-  background-image: linear-gradient(45deg, #ff9ff3, #f368e0);
-}
-
-.game-image.snake {
-  background-image: linear-gradient(45deg, #feca57, #ff9f43);
-}
-
-.game-image.fishing {
-  background-image: linear-gradient(45deg, #48dbfb, #0abde3);
-}
-
-.game-image.typing {
-  background-image: linear-gradient(45deg, #a55eea, #778beb);
+.game-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .game-content {
@@ -470,14 +534,6 @@ const closeManual = () => {
   border-radius: 0.375rem;
   text-decoration: none;
   transition: all 0.3s ease;
-}
-
-/* 页脚 */
-.page-footer {
-  margin-top: 3rem;
-  text-align: center;
-  color: #666;
-  padding: 2rem;
 }
 
 /* 模态框样式 */
