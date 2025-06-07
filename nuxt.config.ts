@@ -14,6 +14,7 @@ export default defineNuxtConfig({
   },
 
   app: {
+
     // head
     head: {
       title: '游戏中心',

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 definePageMeta({
   layout: 'home',
@@ -13,6 +13,8 @@ const showManual = ref(false)
 const showWeather = ref(false)
 const weatherInfo = ref('正在获取天气信息...')
 const noResults = ref(false)
+const currentLanguage = ref('en') // 默认语言为英文
+const showLanguageMenu = ref(false)
 let timeInterval: NodeJS.Timeout
 
 // 游戏数据
@@ -67,21 +69,30 @@ const games = ref([
   }
 ])
 
-// 计算属性：过滤后的游戏
-const filteredGames = computed(() => {
+// 过滤游戏函数
+const filterGames = () => {
   if (!searchTerm.value) {
     noResults.value = false
     return games.value
   }
   
-  const filtered = games.value.filter(game => 
-    game.title.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    game.description.toLowerCase().includes(searchTerm.value.toLowerCase())
-  )
+  const searchTermLower = searchTerm.value.toLowerCase()
+  
+  const filtered = games.value.filter(game => {
+    // 获取当前语言下的游戏标题和描述
+    const title = getGameTitle(game).toLowerCase()
+    const description = getGameDesc(game).toLowerCase()
+    
+    // 在当前语言下的标题和描述中搜索
+    return title.includes(searchTermLower) || description.includes(searchTermLower)
+  })
   
   noResults.value = filtered.length === 0
   return filtered
-})
+}
+
+// 计算属性：过滤后的游戏
+const filteredGames = computed(() => filterGames())
 
 // 更新时间函数
 const updateDateTime = () => {
@@ -101,8 +112,16 @@ const updateDateTime = () => {
     hour12: false
   }
   
-  currentDate.value = now.toLocaleDateString('zh-CN', options)
-  currentTime.value = now.toLocaleTimeString('zh-CN', timeOptions)
+  // 根据当前语言设置日期时间格式
+  let locale = 'en-US' // 默认英文
+  if (currentLanguage.value === 'zh') {
+    locale = 'zh-CN'
+  } else if (currentLanguage.value === 'es') {
+    locale = 'es-ES'
+  }
+  
+  currentDate.value = now.toLocaleDateString(locale, options)
+  currentTime.value = now.toLocaleTimeString(locale, timeOptions)
 }
 
 // 获取天气信息
@@ -123,11 +142,33 @@ const getWeather = async () => {
       main: { temp: 25, humidity: 60 },
       weather: [{ description: '晴朗' }]
     }
-    weatherInfo.value = `城市: ${mockData.name}\\n温度: ${mockData.main.temp}°C\\n天气: ${mockData.weather[0].description}\\n湿度: ${mockData.main.humidity}%`
-  } catch (error) {
-    weatherInfo.value = '天气服务暂时不可用'
+    
+    let weatherText = ''
+    
+    if (currentLanguage.value === 'zh') {
+      weatherText = `城市: ${mockData.name}\\n温度: ${mockData.main.temp}°C\\n天气: ${mockData.weather[0]?.description || ''}\\n湿度: ${mockData.main.humidity}%`
+    } else if (currentLanguage.value === 'en') {
+      weatherText = `City: ${mockData.name}\\nTemperature: ${mockData.main.temp}°C\\nWeather: Clear\\nHumidity: ${mockData.main.humidity}%`
+    } else {
+      weatherText = `Ciudad: ${mockData.name}\\nTemperatura: ${mockData.main.temp}°C\\nClima: Despejado\\nHumedad: ${mockData.main.humidity}%`
+    }
+    
+    weatherInfo.value = weatherText
+  } catch {
+    if (currentLanguage.value === 'zh') {
+      weatherInfo.value = '天气服务暂时不可用'
+    } else if (currentLanguage.value === 'en') {
+      weatherInfo.value = 'Weather service is temporarily unavailable'
+    } else {
+      weatherInfo.value = 'El servicio meteorológico no está disponible temporalmente'
+    }
   }
 }
+
+// 监听语言变化，更新日期时间显示
+watch(currentLanguage, () => {
+  updateDateTime()
+})
 
 // 组件挂载
 onMounted(() => {
@@ -158,6 +199,16 @@ const openManual = () => {
 
 const closeManual = () => {
   showManual.value = false
+}
+
+// 语言相关方法
+const toggleLanguageMenu = () => {
+  showLanguageMenu.value = !showLanguageMenu.value
+}
+
+const changeLanguage = (lang: string) => {
+  currentLanguage.value = lang
+  // 切换语言后不关闭菜单，方便用户继续切换其他语言选项
 }
 
 // 图片加载错误处理
@@ -232,6 +283,74 @@ const handleImageLoad = (event: Event) => {
   const img = event.target as HTMLImageElement
   console.log('图片加载成功:', img.src)
 }
+
+// 定义游戏类型接口
+interface GameItem {
+  id: string;
+  title: string;
+  description: string;
+  link: string;
+  color: string;
+  image: string;
+}
+
+// 获取游戏在当前语言下的标题
+const getGameTitle = (game: GameItem) => {
+  if (currentLanguage.value === 'zh') {
+    return game.title
+  } else if (currentLanguage.value === 'en') {
+    // 英文标题
+    const enTitles: Record<string, string> = {
+      minesweeper: 'Minesweeper',
+      snake: 'Snake',
+      fishing: 'Deep Sea Fishing',
+      typing: 'Typing Challenge',
+      tank: 'Multiplayer Tank Battle',
+      plane: 'Aircraft Battle'
+    }
+    return enTitles[game.id] || game.title
+  } else {
+    // 西班牙语标题
+    const esTitles: Record<string, string> = {
+      minesweeper: 'Buscaminas',
+      snake: 'Serpiente',
+      fishing: 'Pesca en Alta Mar',
+      typing: 'Desafío de Mecanografía',
+      tank: 'Batalla de Tanques Multijugador',
+      plane: 'Batalla de Aviones'
+    }
+    return esTitles[game.id] || game.title
+  }
+}
+
+// 获取游戏在当前语言下的描述
+const getGameDesc = (game: GameItem) => {
+  if (currentLanguage.value === 'zh') {
+    return game.description
+  } else if (currentLanguage.value === 'en') {
+    // 英文描述
+    const enDesc: Record<string, string> = {
+      minesweeper: 'Classic logic puzzle game that tests your logical thinking and luck!',
+      snake: 'Classic growth game, control the snake to eat food and grow!',
+      fishing: 'Experience exciting deep-sea fishing and collect various rare fish!',
+      typing: 'Improve your typing speed and accuracy, challenge yourself!',
+      tank: 'Control your tank and battle with other players on the battlefield! (In development)',
+      plane: 'Control your aircraft, avoid enemy attacks and shoot down enemy planes! (In development)'
+    }
+    return enDesc[game.id] || game.description
+  } else {
+    // 西班牙语描述
+    const esDesc: Record<string, string> = {
+      minesweeper: '¡Juego clásico de lógica que pone a prueba tu pensamiento lógico y suerte!',
+      snake: '¡Juego clásico de crecimiento, controla la serpiente para comer alimentos y crecer!',
+      fishing: '¡Experimenta la emocionante pesca en alta mar y colecciona varios peces raros!',
+      typing: '¡Mejora tu velocidad y precisión de escritura, desafíate a ti mismo!',
+      tank: '¡Controla tu tanque y lucha con otros jugadores en el campo de batalla! (En desarrollo)',
+      plane: '¡Controla tu avión, evita los ataques enemigos y derriba aviones enemigos! (En desarrollo)'
+    }
+    return esDesc[game.id] || game.description
+  }
+}
 </script>
 
 <template>
@@ -245,14 +364,85 @@ const handleImageLoad = (event: Event) => {
       </div>
       
       <!-- 功能按钮 -->
-      <button class="manual-button" @click="openManual">游戏说明书</button>
-      <button class="weather-button" @click="openWeather">查看天气</button>
+      <button class="manual-button" @click="openManual">
+        {{ currentLanguage === 'zh' ? '游戏说明书' : 
+           (currentLanguage === 'en' ? 'Game Manual' : 'Manual del Juego') }}
+      </button>
+      <button class="weather-button" @click="openWeather">
+        {{ currentLanguage === 'zh' ? '查看天气' :
+           (currentLanguage === 'en' ? 'Check Weather' : 'Ver el Clima') }}
+      </button>
+      
+      <!-- 语言切换按钮 -->
+      <div class="language-selector">
+        <div class="language-button-container">
+          <button class="language-button" @click="toggleLanguageMenu">
+            {{ currentLanguage === 'zh' ? '语言' :
+               (currentLanguage === 'en' ? 'Language' : 'Idioma') }}
+            <span class="current-lang">{{ currentLanguage.toUpperCase() }}</span>
+          </button>
+          
+          <!-- 显示可选语言提示 -->
+          <div v-if="!showLanguageMenu" class="language-tooltip">
+            <div class="language-options-preview">
+              <span>
+                <span :class="{'tooltip-active': currentLanguage === 'zh'}">中</span> / 
+                <span :class="{'tooltip-active': currentLanguage === 'en'}">EN</span> / 
+                <span :class="{'tooltip-active': currentLanguage === 'es'}">ES</span>
+              </span>
+            </div>
+            <div class="tooltip-arrow"/>
+          </div>
+        </div>
+        
+        <div v-if="showLanguageMenu" class="language-menu">
+          <button 
+            class="language-option" 
+            :class="{
+              'active': currentLanguage === 'zh',
+              'unselected': currentLanguage !== 'zh'
+            }"
+            @click="changeLanguage('zh')"
+          >
+            {{ currentLanguage === 'zh' ? '中文' :
+               (currentLanguage === 'en' ? 'Chinese' : 'Chino') }}
+          </button>
+          <button 
+            class="language-option" 
+            :class="{
+              'active': currentLanguage === 'en',
+              'unselected': currentLanguage !== 'en'
+            }"
+            @click="changeLanguage('en')"
+          >
+            {{ currentLanguage === 'zh' ? '英文' :
+               (currentLanguage === 'en' ? 'English' : 'Inglés') }}
+          </button>
+          <button 
+            class="language-option" 
+            :class="{
+              'active': currentLanguage === 'es',
+              'unselected': currentLanguage !== 'es'
+            }"
+            @click="changeLanguage('es')"
+          >
+            {{ currentLanguage === 'zh' ? '西班牙语' :
+               (currentLanguage === 'en' ? 'Spanish' : 'Español') }}
+          </button>
+          
+          <!-- 关闭按钮 -->
+          <button class="close-language-menu" @click="showLanguageMenu = false">
+            ✕
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- 主要内容区域 -->
     <div class="main-content">
       <!-- 页面标题 -->
-      <h1 class="page-title">我的游戏集合By Andy3re</h1>
+      <h1 class="page-title">{{ currentLanguage === 'zh' ? '我的游戏集合By Andy3re' : 
+         (currentLanguage === 'en' ? 'My Game Collection By Andy3re' : 'Mi Colección de Juegos Por Andy3re') }}</h1>
       
       <!-- 搜索框 -->
       <div class="search-container">
@@ -260,13 +450,15 @@ const handleImageLoad = (event: Event) => {
           v-model="searchTerm"
           type="text" 
           class="search-box" 
-          placeholder="搜索游戏..."
+          :placeholder="currentLanguage === 'zh' ? '搜索游戏...' : 
+            (currentLanguage === 'en' ? 'Search games...' : 'Buscar juegos...')"
         >
       </div>
       
       <!-- 无结果提示 -->
       <div v-if="noResults" class="no-results">
-        没有找到相关游戏
+        {{ currentLanguage === 'zh' ? '没有找到相关游戏' :
+           (currentLanguage === 'en' ? 'No games found' : 'No se encontraron juegos') }}
       </div>
       
       <!-- 游戏卡片容器 -->
@@ -286,13 +478,14 @@ const handleImageLoad = (event: Event) => {
             >
           </div>
           <div class="game-content">
-            <h2 class="game-title">{{ game.title }}</h2>
-            <p class="game-description">{{ game.description }}</p>
+            <h2 class="game-title">{{ getGameTitle(game) }}</h2>
+            <p class="game-description">{{ getGameDesc(game) }}</p>
             <NuxtLink 
               :to="game.link" 
               :class="`game-button ${game.color}`"
             >
-              开始游戏
+              {{ currentLanguage === 'zh' ? '开始游戏' :
+                 (currentLanguage === 'en' ? 'Start Game' : 'Iniciar Juego') }}
             </NuxtLink>
           </div>
         </div>
@@ -306,21 +499,46 @@ const handleImageLoad = (event: Event) => {
       <div class="modal-content">
         <span class="close-button" @click="closeManual">&times;</span>
         <div class="manual-content">
-          <h1>游戏集合项目</h1>
-          <p>这是一个使用现代Web技术开发的网页游戏集合项目。</p>
+          <h1>{{ currentLanguage === 'zh' ? '游戏集合项目' : 
+             (currentLanguage === 'en' ? 'Game Collection Project' : 'Proyecto de Colección de Juegos') }}</h1>
+          <p>{{ currentLanguage === 'zh' ? '这是一个使用现代Web技术开发的网页游戏集合项目。' : 
+             (currentLanguage === 'en' ? 'This is a web game collection project developed with modern Web technologies.' :
+             'Este es un proyecto de colección de juegos web desarrollado con tecnologías Web modernas.') }}</p>
           
-          <h2>游戏列表</h2>
+          <h2>{{ currentLanguage === 'zh' ? '游戏列表' : 
+             (currentLanguage === 'en' ? 'Game List' : 'Lista de Juegos') }}</h2>
           <ul>
-            <li><strong>扫雷游戏</strong> - 经典的逻辑推理游戏</li>
-            <li><strong>坦克对战</strong> - 多人对战模式</li>
-            <li><strong>飞机大战</strong> - 经典射击游戏</li>
-            <li><strong>贪吃蛇</strong> - 经典成长类游戏</li>
-            <li><strong>深海捕鱼</strong> - 休闲娱乐游戏</li>
-            <li><strong>打字挑战</strong> - 提升打字速度</li>
+            <li><strong>{{ currentLanguage === 'zh' ? '扫雷游戏' : 
+                (currentLanguage === 'en' ? 'Minesweeper' : 'Buscaminas') }}</strong> - 
+                {{ currentLanguage === 'zh' ? '经典的逻辑推理游戏' : 
+                (currentLanguage === 'en' ? 'Classic logic puzzle game' : 'Juego clásico de lógica') }}</li>
+            <li><strong>{{ currentLanguage === 'zh' ? '坦克对战' : 
+                (currentLanguage === 'en' ? 'Tank Battle' : 'Batalla de Tanques') }}</strong> - 
+                {{ currentLanguage === 'zh' ? '多人对战模式' : 
+                (currentLanguage === 'en' ? 'Multiplayer battle mode' : 'Modo de batalla multijugador') }}</li>
+            <li><strong>{{ currentLanguage === 'zh' ? '飞机大战' : 
+                (currentLanguage === 'en' ? 'Aircraft Battle' : 'Batalla de Aviones') }}</strong> - 
+                {{ currentLanguage === 'zh' ? '经典射击游戏' : 
+                (currentLanguage === 'en' ? 'Classic shooting game' : 'Juego clásico de disparos') }}</li>
+            <li><strong>{{ currentLanguage === 'zh' ? '贪吃蛇' : 
+                (currentLanguage === 'en' ? 'Snake' : 'Serpiente') }}</strong> - 
+                {{ currentLanguage === 'zh' ? '经典成长类游戏' : 
+                (currentLanguage === 'en' ? 'Classic growth game' : 'Juego clásico de crecimiento') }}</li>
+            <li><strong>{{ currentLanguage === 'zh' ? '深海捕鱼' : 
+                (currentLanguage === 'en' ? 'Deep Sea Fishing' : 'Pesca en Alta Mar') }}</strong> - 
+                {{ currentLanguage === 'zh' ? '休闲娱乐游戏' : 
+                (currentLanguage === 'en' ? 'Casual entertainment game' : 'Juego de entretenimiento casual') }}</li>
+            <li><strong>{{ currentLanguage === 'zh' ? '打字挑战' : 
+                (currentLanguage === 'en' ? 'Typing Challenge' : 'Desafío de Mecanografía') }}</strong> - 
+                {{ currentLanguage === 'zh' ? '提升打字速度' : 
+                (currentLanguage === 'en' ? 'Improve typing speed' : 'Mejorar la velocidad de escritura') }}</li>
           </ul>
           
-          <h2>操作说明</h2>
-          <p>每个游戏都有独特的操作方式，请在游戏中查看具体说明。</p>
+          <h2>{{ currentLanguage === 'zh' ? '操作说明' : 
+             (currentLanguage === 'en' ? 'Operation Guide' : 'Guía de Operación') }}</h2>
+          <p>{{ currentLanguage === 'zh' ? '每个游戏都有独特的操作方式，请在游戏中查看具体说明。' : 
+             (currentLanguage === 'en' ? 'Each game has unique operation methods, please check the specific instructions in the game.' :
+             'Cada juego tiene métodos de operación únicos, consulte las instrucciones específicas en el juego.') }}</p>
         </div>
       </div>
     </div>
@@ -329,7 +547,8 @@ const handleImageLoad = (event: Event) => {
     <div v-if="showWeather" class="weather-modal" @click.self="closeWeather">
       <div class="weather-content">
         <span class="weather-close" @click="closeWeather">&times;</span>
-        <h2>当前天气</h2>
+        <h2>{{ currentLanguage === 'zh' ? '当前天气' : 
+           (currentLanguage === 'en' ? 'Current Weather' : 'Clima Actual') }}</h2>
         <div class="weather-info">
           {{ weatherInfo }}
         </div>
@@ -415,6 +634,177 @@ const handleImageLoad = (event: Event) => {
 
 .weather-button {
   right: 430px;
+}
+
+/* 语言选择器 */
+.language-selector {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+}
+
+.language-button {
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #4a90e2;
+  border-radius: 20px;
+  color: #4a90e2;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.language-button:hover {
+  background: #4a90e2;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.language-button:after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  bottom: 0;
+  left: 0;
+  background-color: #388e3c;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.3s;
+}
+
+.language-button:hover:after {
+  transform-origin: bottom left;
+  transform: scaleX(1);
+}
+
+.current-lang {
+  margin-left: 8px;
+  padding: 2px 6px;
+  background: #4a90e2;
+  color: white;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.language-menu {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  width: 150px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  z-index: 1001;
+}
+
+.language-option {
+  width: 100%;
+  padding: 10px 15px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.language-option:hover {
+  background: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.language-option.active {
+  background: #e6f3ff;
+  color: #4a90e2;
+  font-weight: bold;
+  border-left: 3px solid #4a90e2;
+}
+
+.language-option.unselected {
+  background: #e8f5e9;
+  color: #388e3c;
+  transition: all 0.3s ease;
+}
+
+/* 语言按钮容器 */
+.language-button-container {
+  position: relative;
+}
+
+/* 语言选择提示 */
+.language-tooltip {
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 1001;
+}
+
+.language-button-container:hover .language-tooltip {
+  opacity: 1;
+}
+
+.tooltip-arrow {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid rgba(0, 0, 0, 0.7);
+}
+
+.language-options-preview {
+  text-align: center;
+}
+
+.tooltip-active {
+  font-weight: bold;
+  color: #4a90e2;
+  text-decoration: underline;
+}
+
+/* 关闭语言菜单按钮 */
+.close-language-menu {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-language-menu:hover {
+  background: rgba(0, 0, 0, 0.2);
+  color: #333;
 }
 
 .manual-button:hover,
@@ -690,6 +1080,16 @@ const handleImageLoad = (event: Event) => {
   
   .weather-button {
     right: 320px;
+  }
+  
+  .language-selector {
+    top: 60px;
+  }
+  
+  .language-tooltip {
+    top: -35px;
+    font-size: 10px;
+    padding: 3px 8px;
   }
 }
 </style>

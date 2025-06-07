@@ -27,7 +27,7 @@ const tileCount = CANVAS_WIDTH / GRID_SIZE
 
 // 初始化游戏
 const initGame = () => {
-  if (process.client) {
+  if (import.meta.client) {
     canvas = document.getElementById('gameCanvas') as HTMLCanvasElement
     if (canvas) {
       ctx = canvas.getContext('2d')
@@ -63,15 +63,18 @@ const drawGame = () => {
   }
   
   // 移动蛇
-  const head = { x: snake[0].x + dx, y: snake[0].y + dy }
-  snake.unshift(head)
-  
-  // 检查是否吃到食物
-  if (head.x === food.x && head.y === food.y) {
-    score.value += 10
-    generateFood()
-  } else {
-    snake.pop()
+  // 确保蛇头存在
+  if (snake.length > 0 && snake[0]) {
+    const head = { x: snake[0].x + dx, y: snake[0].y + dy }
+    snake.unshift(head)
+    
+    // 检查是否吃到食物
+    if (head.x === food.x && head.y === food.y) {
+      score.value += 10
+      generateFood()
+    } else {
+      snake.pop()
+    }
   }
   
   // 检查游戏结束条件
@@ -122,8 +125,11 @@ const isGameOver = () => {
   }
   
   // 撞墙
-  if (snake[0].x < 0 || snake[0].x >= tileCount || 
-      snake[0].y < 0 || snake[0].y >= tileCount) {
+  if (snake[0] && (
+      snake[0].x < 0 || 
+      snake[0].x >= tileCount || 
+      snake[0].y < 0 || 
+      snake[0].y >= tileCount)) {
     return true
   }
   
@@ -194,24 +200,32 @@ const handleKeydown = (event: KeyboardEvent) => {
   
   switch (event.key) {
     case 'ArrowUp':
+    case 'w':
+    case 'W':
       if (dy !== 1) { // 防止向下时向上移动
         dx = 0
         dy = -1
       }
       break
     case 'ArrowDown':
+    case 's':
+    case 'S':
       if (dy !== -1) { // 防止向上时向下移动
         dx = 0
         dy = 1
       }
       break
     case 'ArrowLeft':
+    case 'a':
+    case 'A':
       if (dx !== 1) { // 防止向右时向左移动
         dx = -1
         dy = 0
       }
       break
     case 'ArrowRight':
+    case 'd':
+    case 'D':
       if (dx !== -1) { // 防止向左时向右移动
         dx = 1
         dy = 0
@@ -256,7 +270,7 @@ const recordGameScore = (gameName: string, score: number) => {
 onMounted(() => {
   initGame()
   // 添加键盘事件监听
-  if (process.client) {
+  if (import.meta.client) {
     document.addEventListener('keydown', handleKeydown)
   }
 })
@@ -265,7 +279,7 @@ onUnmounted(() => {
   if (gameInterval.value) {
     clearInterval(gameInterval.value)
   }
-  if (process.client) {
+  if (import.meta.client) {
     document.removeEventListener('keydown', handleKeydown)
   }
 })
@@ -287,7 +301,7 @@ onUnmounted(() => {
         :width="CANVAS_WIDTH" 
         :height="CANVAS_HEIGHT"
         class="game-canvas"
-      ></canvas>
+      />
       
       <div class="controls">
         <button 
@@ -298,23 +312,27 @@ onUnmounted(() => {
         </button>
         <button 
           class="control-button pause-button" 
-          @click="pauseGame"
           :disabled="!gameRunning"
+          @click="pauseGame"
         >
           {{ isPaused ? '继续' : '暂停' }}
         </button>
       </div>
       
       <div class="instructions">
-        <p>使用方向键控制蛇的移动</p>
+        <p>使用方向键或WASD键控制蛇的移动</p>
         <div class="arrow-keys">
           <div class="arrow-row">
             <div class="arrow-key">↑</div>
+            <div class="arrow-key">W</div>
           </div>
           <div class="arrow-row">
             <div class="arrow-key">←</div>
+            <div class="arrow-key">A</div>
             <div class="arrow-key">↓</div>
+            <div class="arrow-key">S</div>
             <div class="arrow-key">→</div>
+            <div class="arrow-key">D</div>
           </div>
         </div>
       </div>
