@@ -492,28 +492,7 @@ onUnmounted(() => {
   background: #666;
 }
 
-.back-button {
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-  color: white;
-  border-radius: 25px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  font-weight: bold;
-  font-size: 16px;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
-.back-button:hover {
-  background: linear-gradient(135deg, #ff5252, #ff3d00);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
-}
 
 .game-container {
   display: flex;
@@ -598,9 +577,6 @@ canvas {
     height: auto;
   }
   
-  .back-button {
-    padding: 10px 20px;
-    font-size: 14px;
-  }
+
 }
 </style> 
