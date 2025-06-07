@@ -64,7 +64,7 @@ export default defineNuxtConfig({
         target: 'esnext',
       },
     },
-    preset: 'cloudflare',
+    preset: 'cloudflare-module',
     prerender: {
       crawlLinks: false,
       routes: ['/'],
