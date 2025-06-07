@@ -1,7 +1,7 @@
 name = "andygame"
 compatibility_date = "2025-06-07"
 main = "functions/[[path]].js"
-node_compat = true
+nodejs_compat = true
 
 [[d1_databases]]
 binding = "DB"
