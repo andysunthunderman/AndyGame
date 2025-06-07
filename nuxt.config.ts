@@ -36,7 +36,7 @@ export default defineNuxtConfig({
 
   // vueuse
   vueuse: {
-    ssrHandlers: true,
+    ssrHandlers: false,
   },
 
   // colorMode
