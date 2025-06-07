@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 definePageMeta({
-  layout: 'default'
+  layout: 'game'
 })
 
 // 响应式数据
@@ -191,10 +191,7 @@ onUnmounted(() => {
 
 <template>
   <div class="typing-game">
-    <!-- 返回按钮 -->
-    <NuxtLink to="/" class="back-button">
-      🏠 返回主页
-    </NuxtLink>
+
 
     <div class="game-container">
       <h1 class="game-title">打字挑战</h1>
@@ -294,32 +291,7 @@ onUnmounted(() => {
   padding: 2rem;
 }
 
-.back-button {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-  color: white;
-  border-radius: 25px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  font-weight: bold;
-  font-size: 16px;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
-.back-button:hover {
-  background: linear-gradient(135deg, #ff5252, #ff3d00);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
-}
 
 .game-container {
   background: rgba(255, 255, 255, 0.95);
@@ -543,11 +515,6 @@ onUnmounted(() => {
     max-width: 200px;
   }
   
-  .back-button {
-    padding: 10px 20px;
-    font-size: 14px;
-    top: 10px;
-    right: 10px;
-  }
+
 }
 </style> 
