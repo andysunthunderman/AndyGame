@@ -22,7 +22,7 @@
     "generate": "nuxi generate",
     "prepare": "nuxi prepare",
     "typecheck": "vue-tsc --noEmit",
-    "deploy": "wrangler deploy --config wrangler.toml"
+    "deploy": "wrangler deploy functions/[[path]].js --config wrangler.toml --assets=.output/public"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
