@@ -26,22 +26,6 @@ const games = ref([
     image: 'minesweeper'
   },
   {
-    id: 'tank',
-    title: '多人坦克对战',
-    description: '控制你的坦克，在战场上与其他玩家对战！',
-    link: '/games/tank',
-    color: 'bg-green-500 hover:bg-green-600',
-    image: 'tank'
-  },
-  {
-    id: 'plane',
-    title: '飞机大战',
-    description: '控制你的飞机，躲避敌人的攻击并击落敌机！',
-    link: '/games/plane',
-    color: 'bg-purple-500 hover:bg-purple-600',
-    image: 'plane'
-  },
-  {
     id: 'snake',
     title: '贪吃蛇',
     description: '经典的贪吃蛇游戏，控制蛇吃食物并成长！',
@@ -64,6 +48,22 @@ const games = ref([
     link: '/games/typing',
     color: 'bg-indigo-500 hover:bg-indigo-600',
     image: 'typing'
+  },
+  {
+    id: 'tank',
+    title: '多人坦克对战',
+    description: '控制你的坦克，在战场上与其他玩家对战！（开发中）',
+    link: '/games/tank',
+    color: 'bg-green-500 hover:bg-green-600',
+    image: 'tank'
+  },
+  {
+    id: 'plane',
+    title: '飞机大战',
+    description: '控制你的飞机，躲避敌人的攻击并击落敌机！（开发中）',
+    link: '/games/plane',
+    color: 'bg-purple-500 hover:bg-purple-600',
+    image: 'plane'
   }
 ])
 
