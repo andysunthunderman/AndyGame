@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欢迎来到游戏集合</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 {
+            color: #4a90e2;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        input {
+            width: 80%;
+            padding: 12px;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            border-color: #357abd;
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+        }
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #357abd;
+            transform: translateY(-2px);
+        }
+        .error {
+            color: #ff4444;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>欢迎来到游戏集合</h1>
+        <form id="nicknameForm">
+            <div class="form-group">
+                <input type="text" id="nickname" placeholder="请输入你的昵称" required>
+            </div>
+            <div class="error" id="errorMessage">昵称不能为空</div>
+            <button type="submit">开始游戏</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('nicknameForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nickname = document.getElementById('nickname').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (!nickname) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // 保存昵称到 localStorage
+            localStorage.setItem('currentPlayer', nickname);
+            
+            // 记录玩家信息
+            const playerInfo = {
+                nickname: nickname,
+                loginTime: new Date().toLocaleString('zh-CN'),
+                visits: 1
+            };
+            
+            // 获取现有玩家记录
+            let players = JSON.parse(localStorage.getItem('players') || '[]');
+            
+            // 检查玩家是否已存在
+            const existingPlayerIndex = players.findIndex(p => p.nickname === nickname);
+            if (existingPlayerIndex !== -1) {
+                // 更新现有玩家信息
+                players[existingPlayerIndex].visits += 1;
+                players[existingPlayerIndex].loginTime = playerInfo.loginTime;
+            } else {
+                // 添加新玩家
+                players.push(playerInfo);
+            }
+            
+            // 保存更新后的玩家记录
+            localStorage.setItem('players', JSON.stringify(players));
+            
+            // 跳转到主页
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html> 
