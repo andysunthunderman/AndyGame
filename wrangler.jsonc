@@ -1,0 +1,26 @@
+{
+  "name": "andy-games",
+  "compatibility_date": "2025-06-07",
+  "main": "functions/[[path]].js",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "andydb",
+      "database_id": "fbf06f0a-f30c-4d36-8bca-c6736bf439e8"
+    }
+  ],
+  "build": {
+    "command": "pnpm build",
+    "output_dir": ".output"
+  },
+  "site": {
+    "bucket": ".output/public"
+  },
+  "bindings": [
+    {
+      "name": "MAIN",
+      "type": "service",
+      "service": ".output/server/index.mjs"
+    }
+  ]
+} 

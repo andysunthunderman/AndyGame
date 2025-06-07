@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   app: {
     // head
     head: {
-      title: 'Element Plus + Nuxt 3',
+      title: '游戏中心',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         {
@@ -64,6 +64,7 @@ export default defineNuxtConfig({
         target: 'esnext',
       },
     },
+    preset: 'cloudflare',
     prerender: {
       crawlLinks: false,
       routes: ['/'],
