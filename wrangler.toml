@@ -1,9 +1,14 @@
-name = "andy-games"
+name = "andygame"
 main = ".output/server/index.mjs"
 compatibility_date = "2024-07-25"
 
 [site]
 bucket = ".output/public"
+
+[[d1_databases]]
+binding = "DB" # This will be the binding name in your code
+database_name = "andygamedb"
+database_id = "2e86cca1-0db0-4f8d-9786-1ce0234c5b52"
 
 [build]
 command = "pnpm build"
