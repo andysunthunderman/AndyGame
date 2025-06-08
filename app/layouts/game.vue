@@ -40,6 +40,9 @@
           <NuxtLink to="/games/typing" class="nav-item game-link">
             ⌨️ 打字挑战
           </NuxtLink>
+          <NuxtLink to="/games/bottle" class="nav-item game-link">
+            🍾 漂流瓶
+          </NuxtLink>
         </div>
       </div>
 
@@ -52,6 +55,7 @@
         <NuxtLink to="/games/plane" class="icon-button" title="飞机大战">✈️</NuxtLink>
         <NuxtLink to="/games/tank" class="icon-button" title="坦克大战">🚗</NuxtLink>
         <NuxtLink to="/games/typing" class="icon-button" title="打字挑战">⌨️</NuxtLink>
+        <NuxtLink to="/games/bottle" class="icon-button" title="漂流瓶">🍾</NuxtLink>
       </div>
     </div>
 

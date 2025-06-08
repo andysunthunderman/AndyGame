@@ -1,14 +1,14 @@
-name = "andygame"
-main = ".output/server/index.mjs"
-compatibility_date = "2024-07-25"
+name = "andy-game"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
 
 [site]
 bucket = ".output/public"
 
 [[d1_databases]]
-binding = "DB" # This will be the binding name in your code
-database_name = "andygamedb"
-database_id = "2e86cca1-0db0-4f8d-9786-1ce0234c5b52"
+binding = "DB" # 这个是在代码中使用的变量名
+database_name = "andy_game_db"
+database_id = "b69f94f9-402f-4ded-b0b5-40e852e6eddb"
 
 [build]
 command = "pnpm build"

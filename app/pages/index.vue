@@ -28,6 +28,14 @@ const games = ref([
     image: 'minesweeper'
   },
   {
+    id: 'bottle',
+    title: '漂流瓶',
+    description: '向大海抛出你的心情，或许会收到意想不到的回应！',
+    link: '/games/bottle',
+    color: 'bg-teal-500 hover:bg-teal-600',
+    image: 'bottle'
+  },
+  {
     id: 'snake',
     title: '贪吃蛇',
     description: '经典的贪吃蛇游戏，控制蛇吃食物并成长！',
@@ -273,6 +281,8 @@ const getGameIcon = (gameTitle: string) => {
       return '🚗'
     case '飞机大战':
       return '✈️'
+    case '漂流瓶':
+      return '🍾'
     default:
       return '🎮'
   }
@@ -306,7 +316,8 @@ const getGameTitle = (game: GameItem) => {
       fishing: 'Deep Sea Fishing',
       typing: 'Typing Challenge',
       tank: 'Multiplayer Tank Battle',
-      plane: 'Aircraft Battle'
+      plane: 'Aircraft Battle',
+      bottle: 'Message in a Bottle'
     }
     return enTitles[game.id] || game.title
   } else {
@@ -317,7 +328,8 @@ const getGameTitle = (game: GameItem) => {
       fishing: 'Pesca en Alta Mar',
       typing: 'Desafío de Mecanografía',
       tank: 'Batalla de Tanques Multijugador',
-      plane: 'Batalla de Aviones'
+      plane: 'Batalla de Aviones',
+      bottle: 'Botella al Mar'
     }
     return esTitles[game.id] || game.title
   }
@@ -335,7 +347,8 @@ const getGameDesc = (game: GameItem) => {
       fishing: 'Experience exciting deep-sea fishing and collect various rare fish!',
       typing: 'Improve your typing speed and accuracy, challenge yourself!',
       tank: 'Control your tank and battle with other players on the battlefield! (In development)',
-      plane: 'Control your aircraft, avoid enemy attacks and shoot down enemy planes! (In development)'
+      plane: 'Control your aircraft, avoid enemy attacks and shoot down enemy planes! (In development)',
+      bottle: 'Share your thoughts with the sea, and maybe receive unexpected responses!'
     }
     return enDesc[game.id] || game.description
   } else {
@@ -346,7 +359,8 @@ const getGameDesc = (game: GameItem) => {
       fishing: '¡Experimenta la emocionante pesca en alta mar y colecciona varios peces raros!',
       typing: '¡Mejora tu velocidad y precisión de escritura, desafíate a ti mismo!',
       tank: '¡Controla tu tanque y lucha con otros jugadores en el campo de batalla! (En desarrollo)',
-      plane: '¡Controla tu avión, evita los ataques enemigos y derriba aviones enemigos! (En desarrollo)'
+      plane: '¡Controla tu avión, evita los ataques enemigos y derriba aviones enemigos! (En desarrollo)',
+      bottle: '¡Comparte tus pensamientos con el mar y quizás recibas respuestas inesperadas!'
     }
     return esDesc[game.id] || game.description
   }
@@ -491,8 +505,6 @@ const getGameDesc = (game: GameItem) => {
         </div>
       </div>
     </div>
-
-
 
     <!-- 游戏说明书模态框 -->
     <div v-if="showManual" class="modal" @click.self="closeManual">
