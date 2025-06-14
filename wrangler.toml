@@ -7,9 +7,9 @@ bucket = ".output/public"
 
 [[d1_databases]]
 binding = "DB" # 这个是在代码中使用的变量名
-database_name = "andy_game_db"
-database_id = "b69f94f9-402f-4ded-b0b5-40e852e6eddb"
+database_name = "andydb"
+database_id = "85f97daa-c67a-4700-84fb-0c544b6db1e8"
 
 [build]
 command = "pnpm build"
-watch_dir = ["src", "app", "server", "public"] 
+watch_dir = ["app", "functions", "public"] 

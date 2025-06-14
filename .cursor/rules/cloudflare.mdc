@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+本程序是部署到cloudflare workers中的， 所以不要使用传统后端服务

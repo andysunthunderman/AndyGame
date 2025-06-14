@@ -387,6 +387,12 @@ const getGameDesc = (game: GameItem) => {
            (currentLanguage === 'en' ? 'Check Weather' : 'Ver el Clima') }}
       </button>
       
+      <!-- 留言板按钮 -->
+      <NuxtLink to="/message-board" class="message-board-button">
+        {{ currentLanguage === 'zh' ? '留言板' :
+           (currentLanguage === 'en' ? 'Message Board' : 'Tablero de Mensajes') }}
+      </NuxtLink>
+      
       <!-- 语言切换按钮 -->
       <div class="language-selector">
         <div class="language-button-container">
@@ -626,7 +632,8 @@ const getGameDesc = (game: GameItem) => {
 
 /* 功能按钮 */
 .manual-button,
-.weather-button {
+.weather-button,
+.message-board-button {
   position: fixed;
   top: 20px;
   padding: 8px 20px;
@@ -638,6 +645,7 @@ const getGameDesc = (game: GameItem) => {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
 }
 
 .manual-button {
@@ -646,6 +654,15 @@ const getGameDesc = (game: GameItem) => {
 
 .weather-button {
   right: 430px;
+}
+
+.message-board-button {
+  right: 580px;
+}
+
+.message-board-button:hover {
+  background: #4a90e2;
+  color: white;
 }
 
 /* 语言选择器 */
@@ -1092,6 +1109,10 @@ const getGameDesc = (game: GameItem) => {
   
   .weather-button {
     right: 320px;
+  }
+  
+  .message-board-button {
+    right: 460px;
   }
   
   .language-selector {
