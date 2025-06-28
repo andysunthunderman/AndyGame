@@ -9,5 +9,11 @@ alwaysApply: true
  构建项目
 pnpm build
 
+
+
 # 启动开发服务器 (正确的命令)
 wrangler dev .output/server/index.mjs --site .output/public --local --port 8787
+
+
+部署到cloudflare命令：
+npx wrangler deploy

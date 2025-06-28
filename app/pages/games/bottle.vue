@@ -1,7 +1,7 @@
 <template>
   <div class="bottle-page">
     <div class="ocean">
-      <div class="waves"></div>
+      <div class="waves"/>
     </div>
     
     <!-- 漂流瓶对话框 -->
@@ -14,33 +14,33 @@
             v-model="bottleContent"
             placeholder="写下你想说的话..."
             :maxlength="500"
-          ></textarea>
+          />
           <div v-else class="message">{{ bottleContent }}</div>
           <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
         </div>
         <div class="dialog-buttons">
           <button
             v-if="isWriting"
-            @click="throwBottle"
             :disabled="!bottleContent.trim() || isLoading"
+            @click="throwBottle"
           >
             {{ isLoading ? '正在扔出...' : '扔出去' }}
           </button>
           <template v-else>
-            <button @click="throwBack" :disabled="isLoading">扔回海里</button>
-            <button @click="closeBottle" :disabled="isLoading">关闭</button>
+            <button :disabled="isLoading" @click="throwBack">扔回海里</button>
+            <button :disabled="isLoading" @click="closeBottle">关闭</button>
           </template>
-          <button @click="closeDialog" :disabled="isLoading">取消</button>
+          <button :disabled="isLoading" @click="closeDialog">取消</button>
         </div>
       </div>
     </div>
 
     <!-- 主按钮 -->
     <div class="main-buttons">
-      <button @click="pickBottle" class="pick-btn" :disabled="isLoading">
+      <button class="pick-btn" :disabled="isLoading" @click="pickBottle">
         {{ isLoading ? '正在打捞...' : '打捞漂流瓶' }}
       </button>
-      <button @click="writeBottle" class="write-btn" :disabled="isLoading">
+      <button class="write-btn" :disabled="isLoading" @click="writeBottle">
         {{ isLoading ? '准备中...' : '写漂流瓶' }}
       </button>
     </div>
@@ -271,30 +271,35 @@ function closeDialog() {
 .main-buttons button {
   padding: 15px 30px;
   font-size: 18px;
+  font-weight: bold;
   border: none;
   border-radius: 25px;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
   opacity: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .main-buttons button:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .main-buttons button:not(:disabled):hover {
-  transform: scale(1.05);
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .pick-btn {
-  background-color: #4CAF50;
+  background: linear-gradient(45deg, #48bb78, #38a169);
   color: white;
 }
 
 .write-btn {
-  background-color: #2196F3;
+  background: linear-gradient(45deg, #4299e1, #0077BE);
   color: white;
 }
 
@@ -312,37 +317,72 @@ function closeDialog() {
 }
 
 .dialog {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  padding: 25px;
+  border-radius: 15px;
   width: 90%;
   max-width: 500px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .dialog h3 {
-  margin: 0 0 20px 0;
+  margin: 0 0 25px 0;
   text-align: center;
+  color: #1a365d;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .dialog-content {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+}
+
+.dialog-content label {
+  display: block;
+  margin-bottom: 8px;
+  color: #2d3748;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 textarea {
   width: 100%;
   height: 150px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  padding: 15px;
+  border: 2px solid #cbd5e0;
+  border-radius: 10px;
   resize: none;
+  font-size: 16px;
+  color: #2d3748;
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #0077BE;
+  box-shadow: 0 0 0 3px rgba(0, 119, 190, 0.1);
+  background: white;
+}
+
+textarea::placeholder {
+  color: #a0aec0;
+  font-style: italic;
 }
 
 .message {
   white-space: pre-wrap;
-  padding: 10px;
-  background: #f5f5f5;
-  border-radius: 5px;
-  min-height: 100px;
+  padding: 20px;
+  background: linear-gradient(135deg, #e6fffa, #f0fff4);
+  border-radius: 10px;
+  min-height: 120px;
+  color: #2d3748;
+  line-height: 1.6;
+  font-size: 16px;
+  border: 1px solid rgba(0, 119, 190, 0.2);
 }
 
 .dialog-buttons {
@@ -352,45 +392,60 @@ textarea {
 }
 
 .dialog-buttons button {
-  padding: 8px 16px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  background-color: #4CAF50;
+  background: linear-gradient(45deg, #48bb78, #38a169);
   color: white;
+  font-weight: 600;
+  font-size: 14px;
   transition: all 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .dialog-buttons button:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .dialog-buttons button:not(:disabled):hover {
-  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .dialog-buttons button:last-child {
-  background-color: #9e9e9e;
+  background: linear-gradient(45deg, #718096, #4a5568);
 }
 
 .error-message {
-  color: #f44336;
-  margin-top: 10px;
+  color: #e53e3e;
+  margin-top: 15px;
   text-align: center;
+  font-weight: 600;
+  background: rgba(254, 178, 178, 0.2);
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(229, 62, 62, 0.3);
 }
 
 .success-message {
   position: fixed;
-  top: 20px;
+  top: 30px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #4CAF50;
+  background: linear-gradient(45deg, #48bb78, #38a169);
   color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
   z-index: 1000;
   animation: fadeInOut 3s ease-in-out;
+  box-shadow: 0 4px 20px rgba(72, 187, 120, 0.4);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes fadeInOut {

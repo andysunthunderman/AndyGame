@@ -10,11 +10,19 @@ binding = "DB" # 这个是在代码中使用的变量名
 database_name = "andydb"
 database_id = "85f97daa-c67a-4700-84fb-0c544b6db1e8"
 
+[[r2_buckets]]
+binding = "ASSETS" # 在代码中使用的变量名
+bucket_name = "andy-game-assets"
+
 [env.local]
 [[env.local.d1_databases]]
 binding = "DB"
 database_name = "andydb"
 database_id = "85f97daa-c67a-4700-84fb-0c544b6db1e8"
+
+[[env.local.r2_buckets]]
+binding = "ASSETS"
+bucket_name = "andy-game-assets"
 
 
 [build]

@@ -181,108 +181,153 @@ onMounted(() => {
 
 <template>
   <div class="sports-page">
-    <h1 class="page-title">运动打卡</h1>
+    <!-- 装饰性背景 -->
+    <div class="background-decoration">
+      <div class="floating-icon" style="--delay: 0s; --x: 10%; --y: 20%;">🏃‍♂️</div>
+      <div class="floating-icon" style="--delay: 1s; --x: 85%; --y: 30%;">🏋️‍♀️</div>
+      <div class="floating-icon" style="--delay: 2s; --x: 15%; --y: 70%;">⚽</div>
+      <div class="floating-icon" style="--delay: 3s; --x: 80%; --y: 60%;">🏀</div>
+      <div class="floating-icon" style="--delay: 4s; --x: 50%; --y: 15%;">🏊‍♂️</div>
+    </div>
 
-    <!-- 用户管理区域 -->
-    <div class="section user-section">
-      <h2>用户管理</h2>
-      <div class="user-form">
-        <input
-          v-model="nickname"
-          type="text"
-          placeholder="输入昵称"
-          class="input"
-        >
-        <button class="button" @click="createUser">创建用户</button>
-      </div>
+    <div class="container">
+      <h1 class="page-title">运动打卡</h1>
 
-      <div class="user-select">
-        <select
-          v-model="selectedUser"
-          class="select"
-        >
-          <option :value="null">请选择用户</option>
-          <option
-            v-for="user in users"
-            :key="user.id"
-            :value="user"
+      <!-- 用户管理区域 -->
+      <div class="section user-section">
+        <h2>🙋‍♂️ 用户管理</h2>
+        <div class="user-form">
+          <input
+            v-model="nickname"
+            type="text"
+            placeholder="输入昵称"
+            class="input"
           >
-            {{ user.nickname }}
-          </option>
-        </select>
-      </div>
-    </div>
+          <button class="button primary-btn" @click="createUser">创建用户</button>
+        </div>
 
-    <!-- 打卡区域 -->
-    <div v-if="selectedUser" class="section record-section">
-      <h2>运动打卡</h2>
-      <div class="record-form">
-        <select
-          v-model="sportType"
-          class="select"
-        >
-          <option value="">选择运动项目</option>
-          <option
-            v-for="type in sportTypes"
-            :key="type.value"
-            :value="type.value"
+        <div class="user-select">
+          <select
+            v-model="selectedUser"
+            class="select"
           >
-            {{ type.label }}
-          </option>
-        </select>
-
-        <input
-          v-model="duration"
-          type="number"
-          placeholder="运动时长（分钟）"
-          class="input"
-        >
-
-        <input
-          v-model="count"
-          type="number"
-          placeholder="运动次数/个数（可选）"
-          class="input"
-        >
-
-        <button class="button" @click="submitRecord">提交打卡</button>
+            <option :value="null">请选择用户</option>
+            <option
+              v-for="user in users"
+              :key="user.id"
+              :value="user"
+            >
+              {{ user.nickname }}
+            </option>
+          </select>
+        </div>
       </div>
-    </div>
 
-    <!-- 查看记录按钮 -->
-    <div v-if="selectedUser" class="section view-section">
-      <button class="button view-button" @click="viewRecords">
-        查看运动记录
-      </button>
-    </div>
+      <!-- 打卡区域 -->
+      <div v-if="selectedUser" class="section record-section">
+        <h2>💪 运动打卡</h2>
+        <div class="record-form">
+          <select
+            v-model="sportType"
+            class="select"
+          >
+            <option value="">选择运动项目</option>
+            <option
+              v-for="type in sportTypes"
+              :key="type.value"
+              :value="type.value"
+            >
+              {{ type.label }}
+            </option>
+          </select>
 
-    <!-- 记录列表 -->
-    <div v-if="showRecords && records.length" class="section records-section">
-      <h2>运动记录</h2>
-      <div class="records-list">
-        <div
-          v-for="record in records"
-          :key="record.id"
-          class="record-item"
-        >
-          <div class="record-content">
-            <span class="sport-type">{{ getSportLabel(record.sport_type) }}</span>
-            <span class="duration">{{ record.duration }}分钟</span>
-            <span v-if="record.count" class="count">{{ record.count }}次</span>
-            <span class="date">{{ formatDate(record.created_at) }}</span>
+          <input
+            v-model="duration"
+            type="number"
+            placeholder="运动时长（分钟）"
+            class="input"
+          >
+
+          <input
+            v-model="count"
+            type="number"
+            placeholder="运动次数/个数（可选）"
+            class="input"
+          >
+
+          <button class="button success-btn" @click="submitRecord">✨ 提交打卡</button>
+        </div>
+      </div>
+
+      <!-- 查看记录按钮 -->
+      <div v-if="selectedUser" class="section view-section">
+        <button class="button view-button" @click="viewRecords">
+          📊 查看运动记录
+        </button>
+      </div>
+
+      <!-- 记录列表 -->
+      <div v-if="showRecords && records.length" class="section records-section">
+        <h2>📈 运动记录</h2>
+        <div class="records-list">
+          <div
+            v-for="record in records"
+            :key="record.id"
+            class="record-item"
+          >
+            <div class="record-content">
+              <span class="sport-type">{{ getSportLabel(record.sport_type) }}</span>
+              <span class="duration">⏱️ {{ record.duration }}分钟</span>
+              <span v-if="record.count" class="count">🔢 {{ record.count }}次</span>
+              <span class="date">📅 {{ formatDate(record.created_at) }}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div v-if="showRecords && !records.length" class="no-records">
-      暂无运动记录
+      <div v-if="showRecords && !records.length" class="no-records">
+        🤔 暂无运动记录
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
 .sports-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.background-decoration {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.floating-icon {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.1;
+  animation: float 6s ease-in-out infinite;
+  animation-delay: var(--delay);
+  left: var(--x);
+  top: var(--y);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(10deg); }
+}
+
+.container {
+  position: relative;
+  z-index: 1;
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
@@ -290,22 +335,48 @@ onMounted(() => {
 
 .page-title {
   text-align: center;
-  color: #2c3e50;
+  color: #ffffff;
   margin-bottom: 2rem;
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  from { 
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); 
+    color: #ffffff;
+  }
+  to { 
+    text-shadow: 0 4px 20px rgba(255, 255, 255, 0.9), 0 0 30px rgba(255, 255, 255, 0.6); 
+    color: #f7fafc;
+  }
 }
 
 .section {
-  background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 2rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: translateY(0);
+  transition: all 0.3s ease;
+}
+
+.section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 .section h2 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .user-form,
@@ -313,33 +384,85 @@ onMounted(() => {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .input,
 .select {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
   font-size: 1rem;
   flex: 1;
+  min-width: 200px;
+  transition: all 0.3s ease;
+  background: white;
+  color: #2d3748;
+}
+
+.input::placeholder {
+  color: #a0aec0;
+  font-weight: 400;
+}
+
+.select option {
+  color: #2d3748;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: #5a67d8;
+  box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.15);
+  transform: translateY(-2px);
 }
 
 .button {
-  padding: 0.5rem 1rem;
-  background-color: #4a90e2;
-  color: white;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.button:hover::before {
+  left: 100%;
 }
 
 .button:hover {
-  background-color: #357abd;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.primary-btn {
+  background: linear-gradient(45deg, #4299e1, #5a67d8);
+  color: white;
+}
+
+.success-btn {
+  background: linear-gradient(45deg, #48bb78, #38b2ac);
+  color: white;
 }
 
 .view-button {
   width: 100%;
+  background: linear-gradient(45deg, #ed8936, #f56500);
+  color: white;
   margin-top: 1rem;
 }
 
@@ -350,47 +473,96 @@ onMounted(() => {
 }
 
 .record-item {
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 4px;
-  border-left: 4px solid #4a90e2;
+  background: linear-gradient(135deg, #f7fafc, #edf2f7);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 5px solid #5a67d8;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.record-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #5a67d8, #764ba2);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.record-item:hover::before {
+  transform: scaleX(1);
+}
+
+.record-item:hover {
+  transform: translateX(10px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
 .record-content {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .sport-type {
   font-weight: bold;
-  color: #4a90e2;
+  color: #5a67d8;
+  font-size: 1.1rem;
+  text-shadow: 0 1px 2px rgba(90, 103, 216, 0.2);
 }
 
 .duration,
 .count {
-  color: #666;
+  color: #2d3748;
+  font-weight: 600;
+  background: rgba(90, 103, 216, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
 }
 
 .date {
   margin-left: auto;
-  color: #999;
-  font-size: 0.9rem;
+  color: #4a5568;
+  font-size: 0.85rem;
+  font-weight: 500;
+  opacity: 0.8;
 }
 
 .no-records {
   text-align: center;
-  color: #666;
-  padding: 2rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  color: #4a5568;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 @media (max-width: 640px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+  }
+  
   .user-form,
   .record-form {
     flex-direction: column;
+  }
+  
+  .input,
+  .select {
+    min-width: auto;
   }
 
   .record-content {
@@ -401,6 +573,10 @@ onMounted(() => {
 
   .date {
     margin-left: 0;
+  }
+  
+  .floating-icon {
+    font-size: 1.5rem;
   }
 }
 </style> 
