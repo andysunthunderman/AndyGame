@@ -1,5 +1,5 @@
 name = "andy-game"
-main = "src/index.ts"
+main = ".output/server/index.mjs"
 compatibility_date = "2024-01-01"
 
 [site]
@@ -9,6 +9,13 @@ bucket = ".output/public"
 binding = "DB" # 这个是在代码中使用的变量名
 database_name = "andydb"
 database_id = "85f97daa-c67a-4700-84fb-0c544b6db1e8"
+
+[env.local]
+[[env.local.d1_databases]]
+binding = "DB"
+database_name = "andydb"
+database_id = "85f97daa-c67a-4700-84fb-0c544b6db1e8"
+
 
 [build]
 command = "pnpm build"

@@ -74,6 +74,14 @@ const games = ref([
     link: '/games/plane',
     color: 'bg-purple-500 hover:bg-purple-600',
     image: 'plane'
+  },
+  {
+    id: 'sports',
+    title: '运动打卡',
+    description: '记录你的运动时间，培养健康生活习惯！',
+    link: '/sports',
+    color: 'bg-green-500 hover:bg-green-600',
+    image: 'sports'
   }
 ])
 

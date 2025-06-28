@@ -3,4 +3,11 @@ description:
 globs: 
 alwaysApply: true
 ---
-本程序是部署到cloudflare workers中的， 所以不要使用传统后端服务
+本程序是部署到cloudflare workers中的。本项目使用cloudflare的D1数据库。部署的是 Nuxt to Worker，不是 Pages。不能直接使用 Cloudflare Pages Functions 的结构，因为它是为 Cloudflare Pages 平台定制的，和 Workers 有区别。必须用 Worker 模式 + Nuxt API 写法。
+
+运行方式：
+ 构建项目
+pnpm build
+
+# 启动开发服务器 (正确的命令)
+wrangler dev .output/server/index.mjs --site .output/public --local --port 8787

@@ -1,5 +1,6 @@
 // https://v3.nuxtjs.org/docs/directory-structure/nuxt.config
 export default defineNuxtConfig({
+  ssr: true,
   modules: [
     '@nuxt/eslint',
     '@vueuse/nuxt',
@@ -14,7 +15,6 @@ export default defineNuxtConfig({
   },
 
   app: {
-
     // head
     head: {
       title: '游戏中心',
@@ -70,7 +70,7 @@ export default defineNuxtConfig({
       crawlLinks: false,
       routes: ['/'],
       ignore: ['/hi'],
-    },
+    }
   },
 
   vite: {
@@ -81,7 +81,7 @@ export default defineNuxtConfig({
           additionalData: `@use "@/assets/scss/element/index.scss" as element;`,
         },
       },
-    },
+    }
   },
 
   elementPlus: {
