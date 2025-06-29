@@ -89,15 +89,83 @@
               </button>
             </div>
             <div v-if="accessResult" class="test-result">
-              <div v-if="accessResult.success">
+              <div v-if="(accessResult as any).success">
                 <p>✅ 文件访问成功！</p>
-                <a :href="accessResult.url" target="_blank" class="file-link">
-                  {{ accessResult.url }}
+                <a :href="(accessResult as any).url" target="_blank" class="file-link">
+                  {{ (accessResult as any).url }}
                 </a>
               </div>
               <div v-else class="error">
-                ❌ 访问失败: {{ accessResult.error }}
+                ❌ 访问失败: {{ (accessResult as any).error }}
               </div>
+            </div>
+          </div>
+
+          <!-- 文件删除测试 -->
+          <div class="api-test-item">
+            <h3>🗑️ 文件删除测试</h3>
+            <div class="test-controls">
+              <input v-model="deleteFileKey" placeholder="输入要删除的文件 key" >
+              <input v-model="adminKey" type="password" placeholder="输入管理员密钥" >
+              <button :disabled="testing || !deleteFileKey || !adminKey" class="test-btn delete-btn" @click="testFileDelete">
+                {{ testing ? '删除中...' : '删除文件' }}
+              </button>
+            </div>
+            <div v-if="deleteResult" class="test-result">
+              <div v-if="(deleteResult as any).success" class="success">
+                ✅ {{ (deleteResult as any).message }}
+              </div>
+              <div v-else class="error">
+                ❌ 删除失败: {{ (deleteResult as any).error }}
+              </div>
+            </div>
+            <div class="delete-warning">
+              ⚠️ 删除操作不可恢复，请谨慎操作！
+            </div>
+          </div>
+
+          <!-- 文件列表展示与管理 -->
+          <div class="api-test-item">
+            <h3>📋 文件列表管理</h3>
+            <div class="test-controls">
+              <button :disabled="testing" class="test-btn" @click="loadFileListForManagement">
+                {{ testing ? '加载中...' : '加载文件列表' }}
+              </button>
+              <label>
+                <input v-model="showImagePreview" type="checkbox" > 显示图片预览
+              </label>
+            </div>
+            <div v-if="managementFileList && managementFileList.length > 0" class="file-management-list">
+              <div v-for="file in managementFileList" :key="file.key" class="file-management-item">
+                <div class="file-info-section">
+                  <div class="file-basic-info">
+                    <strong>{{ file.fileName }}</strong>
+                    <span class="file-meta">{{ formatFileSize(file.size) }} | {{ file.category }}</span>
+                  </div>
+                  <div class="file-key">{{ file.key }}</div>
+                  <div v-if="showImagePreview && file.category === 'images'" class="image-preview">
+                    <img :src="file.url" :alt="file.fileName" @error="handleImageError" >
+                  </div>
+                </div>
+                <div class="file-actions-section">
+                  <button class="action-btn view-btn" @click="openFile(file.url)">
+                    👁️ 查看
+                  </button>
+                  <button class="action-btn copy-btn" @click="copyFileUrl(file.url)">
+                    📋 复制链接
+                  </button>
+                  <button 
+                    class="action-btn delete-btn" 
+                    :disabled="deletingFiles.has(file.key)"
+                    @click="deleteFileFromList(file.key)"
+                  >
+                    {{ deletingFiles.has(file.key) ? '删除中...' : '🗑️ 删除' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div v-else-if="managementFileList && managementFileList.length === 0" class="no-files">
+              暂无文件
             </div>
           </div>
         </div>
@@ -254,6 +322,27 @@ export default defineEventHandler(async (event) => {
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+// 类型定义
+interface FileItem {
+  key: string
+  size: number
+  etag: string
+  uploaded: string
+  storageClass?: string
+  metadata: Record<string, string>
+  httpMetadata: Record<string, string>
+  url: string
+  category: string
+  fileName: string
+}
+
+interface ApiResponse {
+  success: boolean
+  error?: string
+  message?: string
+  data?: unknown
+}
+
 // 页面状态
 const activeTab = ref('upload')
 
@@ -275,6 +364,14 @@ const testCategory = ref('test')
 const accessFileKey = ref('')
 const accessResult = ref<Record<string, unknown> | null>(null)
 const testFileInput = ref<HTMLInputElement>()
+
+// 删除功能相关
+const deleteFileKey = ref('')
+const adminKey = ref('')
+const deleteResult = ref<ApiResponse | null>(null)
+const managementFileList = ref<FileItem[]>([])
+const showImagePreview = ref(true)
+const deletingFiles = ref(new Set<string>())
 
 // 性能指标
 const performanceMetrics = ref({
@@ -361,6 +458,138 @@ const testFileAccess = async () => {
   } finally {
     testing.value = false
   }
+}
+
+// 测试文件删除
+const testFileDelete = async () => {
+  if (!deleteFileKey.value || !adminKey.value) {
+    deleteResult.value = { success: false, error: '请输入文件 key 和管理员密钥' }
+    return
+  }
+  
+  testing.value = true
+  deleteResult.value = null
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/files/delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        fileKey: deleteFileKey.value,
+        adminKey: adminKey.value
+      })
+    })
+    
+    deleteResult.value = await response.json()
+    
+    // 如果删除成功，刷新文件列表
+    if (deleteResult.value?.success) {
+      deleteFileKey.value = ''
+      if (managementFileList.value.length > 0) {
+        loadFileListForManagement()
+      }
+    }
+  } catch (error) {
+    deleteResult.value = { success: false, error: '网络错误: ' + error }
+  } finally {
+    testing.value = false
+  }
+}
+
+// 加载文件列表用于管理
+const loadFileListForManagement = async () => {
+  testing.value = true
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/files/list?limit=50`)
+    const result = await response.json()
+    
+    if (result.success) {
+      managementFileList.value = result.data.files || []
+    } else {
+      managementFileList.value = []
+      console.error('加载文件列表失败:', result.error)
+    }
+  } catch (error) {
+    managementFileList.value = []
+    console.error('加载文件列表错误:', error)
+  } finally {
+    testing.value = false
+  }
+}
+
+// 从列表中删除文件
+const deleteFileFromList = async (fileKey: string) => {
+  if (!adminKey.value) {
+    alert('请先在上方输入管理员密钥')
+    return
+  }
+  
+  if (!confirm(`确定要删除文件 "${fileKey}" 吗？此操作不可恢复！`)) {
+    return
+  }
+  
+  deletingFiles.value.add(fileKey)
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/files/delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        fileKey: fileKey,
+        adminKey: adminKey.value
+      })
+    })
+    
+    const result = await response.json()
+    
+    if (result.success) {
+      // 从列表中移除已删除的文件
+      managementFileList.value = managementFileList.value.filter(file => file.key !== fileKey)
+      alert('文件删除成功')
+    } else {
+      alert('删除失败: ' + result.error)
+    }
+  } catch (error) {
+    alert('删除失败: ' + error)
+  } finally {
+    deletingFiles.value.delete(fileKey)
+  }
+}
+
+// 打开文件
+const openFile = (url: string) => {
+  window.open(url, '_blank')
+}
+
+// 复制文件链接
+const copyFileUrl = async (url: string) => {
+  try {
+    await navigator.clipboard.writeText(url)
+    alert('链接已复制到剪贴板')
+  } catch (error) {
+    console.error('复制失败:', error)
+    alert('复制失败，请手动复制')
+  }
+}
+
+// 处理图片加载错误
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  img.style.display = 'none'
+}
+
+// 格式化文件大小
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
 // 刷新性能指标
@@ -794,6 +1023,163 @@ definePageMeta({
   box-shadow: 0 6px 16px rgba(66, 153, 225, 0.4);
 }
 
+/* 删除功能相关样式 */
+.delete-btn {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+  color: white;
+}
+
+.delete-btn:hover:not(:disabled) {
+  background: linear-gradient(45deg, #c53030, #9c2626) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(197, 48, 48, 0.4);
+}
+
+.delete-warning {
+  background: rgba(254, 178, 178, 0.2);
+  color: #e53e3e;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(229, 62, 62, 0.3);
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.success {
+  color: #38a169;
+  font-weight: bold;
+  background: rgba(154, 230, 180, 0.2);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 161, 105, 0.3);
+}
+
+.file-management-list {
+  max-height: 500px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.file-management-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s ease;
+}
+
+.file-management-item:hover {
+  background-color: #f8f9fa;
+}
+
+.file-management-item:last-child {
+  border-bottom: none;
+}
+
+.file-info-section {
+  flex: 1;
+  margin-right: 15px;
+}
+
+.file-basic-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.file-basic-info strong {
+  color: #2d3748;
+  font-size: 14px;
+}
+
+.file-meta {
+  font-size: 12px;
+  color: #666;
+}
+
+.file-key {
+  font-family: monospace;
+  font-size: 11px;
+  color: #4a5568;
+  background: #f1f5f9;
+  padding: 4px 6px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  word-break: break-all;
+}
+
+.image-preview {
+  margin-top: 8px;
+}
+
+.image-preview img {
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.file-actions-section {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.action-btn.view-btn {
+  background: linear-gradient(45deg, #4299e1, #3182ce);
+  color: white;
+}
+
+.action-btn.copy-btn {
+  background: linear-gradient(45deg, #48bb78, #38a169);
+  color: white;
+}
+
+.action-btn.delete-btn {
+  background: linear-gradient(45deg, #e53e3e, #c53030);
+  color: white;
+}
+
+.action-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.no-files {
+  text-align: center;
+  color: #666;
+  padding: 40px 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .file-upload-demo-page {
@@ -829,6 +1215,27 @@ definePageMeta({
   .feature-badges {
     flex-direction: column;
     align-items: center;
+  }
+  
+  .file-management-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+  
+  .file-actions-section {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .action-btn {
+    flex: 1;
+    min-width: 80px;
+  }
+  
+  .image-preview img {
+    max-width: 80px;
+    max-height: 80px;
   }
 }
 </style> 

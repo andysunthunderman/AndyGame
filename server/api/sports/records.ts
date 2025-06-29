@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
     try {
       const body = await readBody(event)
       console.log('创建运动记录请求体:', body)
-      const { userId, sportType, duration, count, exerciseTime } = body
+      const { userId, sportType, duration, count, exerciseTime, imageUrl } = body
       
       if (!userId || !sportType || !duration || !exerciseTime) {
         throw createError({
@@ -67,8 +67,8 @@ export default defineEventHandler(async (event) => {
 
       console.log('正在创建运动记录...')
       const result = await db.prepare(
-        'INSERT INTO sports_records (user_id, sport_type, duration, count, exercise_time, check_in_time) VALUES (?, ?, ?, ?, ?, datetime("now")) RETURNING *'
-      ).bind(userId, sportType, duration, count || null, exerciseTime).all()
+        'INSERT INTO sports_records (user_id, sport_type, duration, count, exercise_time, check_in_time, image_url) VALUES (?, ?, ?, ?, ?, datetime("now"), ?) RETURNING *'
+      ).bind(userId, sportType, duration, count || null, exerciseTime, imageUrl || null).all()
       console.log('创建运动记录结果:', result)
       
       setResponseStatus(event, 201)

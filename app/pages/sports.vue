@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+definePageMeta({
+  layout: 'game'
+})
+
 interface SportType {
   value: string
   label: string
@@ -21,6 +25,7 @@ interface SportRecord {
   exercise_time: string
   check_in_time: string
   created_at: string
+  image_url?: string
 }
 
 const API_BASE_URL = import.meta.env.DEV ? 'http://127.0.0.1:8787' : ''
@@ -35,6 +40,14 @@ const records = ref<SportRecord[]>([])
 const showRecords = ref(false)
 const sportType = ref('')
 const exerciseTime = ref('')
+
+// 图片上传相关
+const selectedImage = ref<File | null>(null)
+const uploadingImage = ref(false)
+const uploadedImageUrl = ref('')
+const uploadError = ref('')
+const imagePreviewUrl = ref('')
+const imageInput = ref<HTMLInputElement>()
 
 // 获取所有用户
 const fetchUsers = async () => {
@@ -128,12 +141,36 @@ const submitRecord = async () => {
     alert('请先选择用户')
     return
   }
-  if (!sportType.value || !duration.value || !exerciseTime.value) {
-    alert('请填写必要信息')
+
+  console.log('提交前的表单数据:', {
+    sportType: sportType.value,
+    duration: duration.value,
+    exerciseTime: exerciseTime.value,
+    count: count.value,
+    hasImage: !!selectedImage.value
+  })
+
+  const missingFields = []
+  if (!sportType.value) missingFields.push('运动项目')
+  if (!duration.value) missingFields.push('运动时长')
+  if (!exerciseTime.value) missingFields.push('运动时间')
+
+  if (missingFields.length > 0) {
+    alert(`请填写以下必要信息：${missingFields.join('、')}`)
     return
   }
 
   try {
+    // 如果有选择图片，先上传图片
+    let imageUrl = ''
+    if (selectedImage.value) {
+      imageUrl = await uploadImage() || ''
+      if (uploadError.value) {
+        alert(`图片上传失败: ${uploadError.value}`)
+        return
+      }
+    }
+
     const response = await fetch(`${API_BASE_URL}/api/sports/records`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -142,7 +179,8 @@ const submitRecord = async () => {
         sportType: sportType.value,
         duration: parseInt(duration.value),
         count: count.value ? parseInt(count.value) : null,
-        exerciseTime: exerciseTime.value
+        exerciseTime: exerciseTime.value,
+        imageUrl: imageUrl
       })
     })
 
@@ -166,6 +204,7 @@ const submitRecord = async () => {
       duration.value = ''
       count.value = ''
       exerciseTime.value = ''
+      removeImage() // 清除图片
       // 刷新记录列表
       if (selectedUser.value) {
         viewRecords()
@@ -218,9 +257,103 @@ const fetchSportTypes = async () => {
   }
 }
 
+// 设置默认运动时间为当前时间
+const setDefaultExerciseTime = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  const hours = String(now.getHours()).padStart(2, '0')
+  const minutes = String(now.getMinutes()).padStart(2, '0')
+  exerciseTime.value = `${year}-${month}-${day}T${hours}:${minutes}`
+}
+
+// 图片上传相关函数
+const handleImageSelect = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    const file = target.files[0]
+    
+    // 检查文件类型
+    if (!file.type.startsWith('image/')) {
+      uploadError.value = '请选择图片文件'
+      return
+    }
+    
+    // 检查文件大小（限制为5MB）
+    if (file.size > 5 * 1024 * 1024) {
+      uploadError.value = '图片大小不能超过5MB'
+      return
+    }
+    
+    selectedImage.value = file
+    uploadError.value = ''
+    
+    // 创建预览URL
+    if (imagePreviewUrl.value) {
+      URL.revokeObjectURL(imagePreviewUrl.value)
+    }
+    imagePreviewUrl.value = URL.createObjectURL(file)
+  }
+}
+
+const uploadImage = async () => {
+  if (!selectedImage.value) return null
+  
+  uploadingImage.value = true
+  uploadError.value = ''
+  
+  try {
+    const formData = new FormData()
+    formData.append('file', selectedImage.value)
+    formData.append('category', 'sports')
+    
+    const response = await fetch(`${API_BASE_URL}/api/files/upload`, {
+      method: 'POST',
+      body: formData
+    })
+    
+    const result = await response.json()
+    
+    if (result.success) {
+      uploadedImageUrl.value = result.data.url
+      return result.data.url
+    } else {
+      uploadError.value = result.error || '图片上传失败'
+      return null
+    }
+  } catch (error) {
+    console.error('图片上传失败:', error)
+    uploadError.value = '图片上传失败，请检查网络连接'
+    return null
+  } finally {
+    uploadingImage.value = false
+  }
+}
+
+const removeImage = () => {
+  selectedImage.value = null
+  uploadedImageUrl.value = ''
+  uploadError.value = ''
+  if (imagePreviewUrl.value) {
+    URL.revokeObjectURL(imagePreviewUrl.value)
+    imagePreviewUrl.value = ''
+  }
+}
+
+// 格式化文件大小
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
 onMounted(() => {
   fetchUsers()
   fetchSportTypes()
+  setDefaultExerciseTime()
 })
 </script>
 
@@ -304,10 +437,56 @@ onMounted(() => {
             v-model="exerciseTime"
             type="datetime-local"
             class="input"
-            placeholder="运动时间"
+            :max="new Date().toISOString().slice(0, 16)"
+            @click="exerciseTime === '' && setDefaultExerciseTime()"
           >
 
-          <button class="button success-btn" @click="submitRecord">✨ 提交打卡</button>
+          <!-- 图片上传区域 -->
+          <div class="image-upload-section">
+            <h3>📸 运动照片（可选）</h3>
+            
+            <div v-if="!selectedImage && !imagePreviewUrl" class="upload-area" @click="imageInput?.click()">
+              <input
+                ref="imageInput"
+                type="file"
+                accept="image/*"
+                style="display: none"
+                @change="handleImageSelect"
+              >
+              <div class="upload-icon">🖼️</div>
+              <p>点击选择运动照片</p>
+              <p class="upload-hint">支持 JPG、PNG、GIF 格式，最大 5MB</p>
+            </div>
+
+            <div v-if="imagePreviewUrl" class="image-preview">
+              <img :src="imagePreviewUrl" alt="运动照片预览" class="preview-image">
+              <div class="image-info">
+                <p>{{ selectedImage?.name }}</p>
+                <p class="file-size">{{ selectedImage ? formatFileSize(selectedImage.size) : '' }}</p>
+              </div>
+              <div class="image-actions">
+                <button type="button" class="button danger-btn" @click="removeImage">
+                  🗑️ 删除
+                </button>
+                <button type="button" class="button secondary-btn" @click="imageInput?.click()">
+                  🔄 重新选择
+                </button>
+              </div>
+            </div>
+
+            <div v-if="uploadingImage" class="uploading-status">
+              <div class="spinner"/>
+              <p>正在上传图片...</p>
+            </div>
+
+            <div v-if="uploadError" class="error-message">
+              {{ uploadError }}
+            </div>
+          </div>
+
+          <button class="button success-btn" :disabled="uploadingImage" @click="submitRecord">
+            {{ uploadingImage ? '上传中...' : '✨ 提交打卡' }}
+          </button>
         </div>
       </div>
 
@@ -334,6 +513,9 @@ onMounted(() => {
               <div class="record-details">
                 <span class="duration">⏱️ {{ record.duration }}分钟</span>
                 <span v-if="record.count" class="count">🔢 {{ record.count }}次</span>
+              </div>
+              <div v-if="record.image_url" class="record-image">
+                <img :src="record.image_url" alt="运动照片" class="sport-image" @error="(e) => (e.target as HTMLImageElement).style.display='none'">
               </div>
               <div class="record-footer">
                 <span class="check-in-time">打卡时间：{{ formatDate(record.check_in_time) }}</span>
@@ -620,6 +802,151 @@ onMounted(() => {
   font-size: 14px;
   width: 100%;
   margin-bottom: 10px;
+}
+
+/* 图片上传样式 */
+.image-upload-section {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 2px dashed #e2e8f0;
+  border-radius: 10px;
+  background: rgba(247, 250, 252, 0.5);
+}
+
+.image-upload-section h3 {
+  margin: 0 0 1rem 0;
+  color: #2d3748;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.upload-area {
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  border: 2px dashed #cbd5e0;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+  border-color: #5a67d8;
+  background-color: #f7fafc;
+  transform: translateY(-2px);
+}
+
+.upload-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  color: #5a67d8;
+}
+
+.upload-area p {
+  margin: 0.5rem 0;
+  color: #4a5568;
+  font-weight: 600;
+}
+
+.upload-hint {
+  font-size: 0.85rem !important;
+  color: #a0aec0 !important;
+  font-weight: 400 !important;
+}
+
+.image-preview {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.image-info p {
+  margin: 0.25rem 0;
+  color: #4a5568;
+}
+
+.file-size {
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.image-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.danger-btn {
+  background: linear-gradient(45deg, #e53e3e, #c53030);
+  color: white;
+}
+
+.secondary-btn {
+  background: linear-gradient(45deg, #718096, #4a5568);
+  color: white;
+}
+
+.uploading-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #5a67d8;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  background: rgba(254, 178, 178, 0.2);
+  color: #e53e3e;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(229, 62, 62, 0.3);
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+/* 运动记录中的图片显示 */
+.record-image {
+  margin: 1rem 0;
+}
+
+.sport-image {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.sport-image:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 @media (max-width: 640px) {

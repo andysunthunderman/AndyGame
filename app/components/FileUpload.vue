@@ -56,6 +56,9 @@
     <!-- 已上传文件列表 -->
     <div v-if="showFileList" class="file-list">
       <h4>已上传的文件 <button class="refresh-btn" @click="refreshFileList">🔄</button></h4>
+      <div class="admin-controls">
+        <input v-model="adminKey" type="password" placeholder="输入管理员密钥以启用删除功能" >
+      </div>
       <div v-if="loadingFiles" class="loading">加载中...</div>
       <div v-else-if="fileList.length === 0" class="no-files">暂无文件</div>
       <div v-else class="files">
@@ -64,10 +67,19 @@
             <strong>{{ file.fileName }}</strong>
             <span class="file-size">{{ formatFileSize(file.size) }}</span>
             <span class="file-category">{{ file.category }}</span>
+            <div class="file-key">{{ file.key }}</div>
           </div>
           <div class="file-actions">
-            <a :href="file.url" target="_blank" class="view-link">查看</a>
-            <button class="copy-btn" @click="copyFileUrl(file.url)">复制</button>
+            <a :href="file.url" target="_blank" class="view-link">👁️ 查看</a>
+            <button class="copy-btn" @click="copyFileUrl(file.url)">📋 复制</button>
+            <button 
+              v-if="adminKey" 
+              class="delete-btn" 
+              :disabled="deletingFiles.has(file.key)"
+              @click="deleteFile(file.key)"
+            >
+              {{ deletingFiles.has(file.key) ? '删除中...' : '🗑️ 删除' }}
+            </button>
           </div>
         </div>
       </div>
@@ -109,6 +121,10 @@ const customFileName = ref('')
 const showFileList = ref(true)
 const fileList = ref<FileListItem[]>([])
 const loadingFiles = ref(false)
+
+// 删除功能相关
+const adminKey = ref('')
+const deletingFiles = ref(new Set<string>())
 
 // API基础URL
 const API_BASE_URL = import.meta.env.DEV ? 'http://127.0.0.1:8787' : ''
@@ -245,6 +261,47 @@ const formatFileSize = (bytes: number): string => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+// 删除文件
+const deleteFile = async (fileKey: string) => {
+  if (!adminKey.value) {
+    alert('请先输入管理员密钥')
+    return
+  }
+  
+  if (!confirm(`确定要删除文件 "${fileKey}" 吗？此操作不可恢复！`)) {
+    return
+  }
+  
+  deletingFiles.value.add(fileKey)
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/files/delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        fileKey: fileKey,
+        adminKey: adminKey.value
+      })
+    })
+    
+    const result = await response.json()
+    
+    if (result.success) {
+      // 从列表中移除已删除的文件
+      fileList.value = fileList.value.filter(file => file.key !== fileKey)
+      alert('文件删除成功')
+    } else {
+      alert('删除失败: ' + result.error)
+    }
+  } catch (error) {
+    alert('删除失败: ' + error)
+  } finally {
+    deletingFiles.value.delete(fileKey)
+  }
 }
 
 // 组件挂载时获取文件列表
@@ -391,10 +448,11 @@ onMounted(() => {
 }
 
 .file-list h4 {
+  margin: 0 0 15px 0;
+  color: #2d3748;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
 }
 
 .refresh-btn {
@@ -441,5 +499,68 @@ onMounted(() => {
 .file-item .file-actions a {
   padding: 4px 8px;
   font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.file-item .file-actions .view-link {
+  background: linear-gradient(45deg, #4299e1, #3182ce);
+  color: white;
+}
+
+.file-item .file-actions .copy-btn {
+  background: linear-gradient(45deg, #48bb78, #38a169);
+  color: white;
+}
+
+.file-item .file-actions .delete-btn {
+  background: linear-gradient(45deg, #e53e3e, #c53030);
+  color: white;
+}
+
+.file-item .file-actions button:hover:not(:disabled),
+.file-item .file-actions a:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.file-item .file-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.admin-controls {
+  margin-bottom: 15px;
+}
+
+.admin-controls input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2d3748;
+  transition: all 0.3s ease;
+}
+
+.admin-controls input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.file-key {
+  font-family: monospace;
+  font-size: 11px;
+  color: #666;
+  background: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  word-break: break-all;
 }
 </style> 
