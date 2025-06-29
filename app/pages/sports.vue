@@ -1,17 +1,40 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+interface SportType {
+  value: string
+  label: string
+}
+
+interface User {
+  id: number
+  nickname: string
+  created_at: string
+}
+
+interface SportRecord {
+  id: number
+  user_id: number
+  sport_type: string
+  duration: number
+  count: number | null
+  exercise_time: string
+  check_in_time: string
+  created_at: string
+}
+
 const API_BASE_URL = import.meta.env.DEV ? 'http://127.0.0.1:8787' : ''
 
 const nickname = ref('')
-const selectedUser = ref(null)
-const users = ref([])
-const sportTypes = ref([])
+const selectedUser = ref<User | null>(null)
+const users = ref<User[]>([])
+const sportTypes = ref<SportType[]>([])
 const duration = ref('')
 const count = ref('')
-const records = ref([])
+const records = ref<SportRecord[]>([])
 const showRecords = ref(false)
 const sportType = ref('')
+const exerciseTime = ref('')
 
 // 获取所有用户
 const fetchUsers = async () => {
@@ -105,7 +128,7 @@ const submitRecord = async () => {
     alert('请先选择用户')
     return
   }
-  if (!sportType.value || !duration.value) {
+  if (!sportType.value || !duration.value || !exerciseTime.value) {
     alert('请填写必要信息')
     return
   }
@@ -118,9 +141,18 @@ const submitRecord = async () => {
         userId: selectedUser.value.id,
         sportType: sportType.value,
         duration: parseInt(duration.value),
-        count: count.value ? parseInt(count.value) : null
+        count: count.value ? parseInt(count.value) : null,
+        exerciseTime: exerciseTime.value
       })
     })
+
+    if (!response.ok) {
+      const data = await response.json()
+      const errorMessage = data.statusMessage || data.data?.details || `HTTP error! status: ${response.status}`
+      alert(`提交运动记录失败: ${errorMessage}`)
+      return
+    }
+
     const data = await response.json()
     
     if (data.error) {
@@ -133,10 +165,17 @@ const submitRecord = async () => {
       sportType.value = ''
       duration.value = ''
       count.value = ''
+      exerciseTime.value = ''
+      // 刷新记录列表
+      if (selectedUser.value) {
+        viewRecords()
+      }
+    } else {
+      alert('提交成功，但返回数据格式异常')
     }
   } catch (error) {
     console.error('提交运动记录失败:', error)
-    alert('提交运动记录失败，请重试')
+    alert(`提交运动记录失败: ${error instanceof Error ? error.message : '未知错误'}`)
   }
 }
 
@@ -261,6 +300,13 @@ onMounted(() => {
             class="input"
           >
 
+          <input
+            v-model="exerciseTime"
+            type="datetime-local"
+            class="input"
+            placeholder="运动时间"
+          >
+
           <button class="button success-btn" @click="submitRecord">✨ 提交打卡</button>
         </div>
       </div>
@@ -272,27 +318,29 @@ onMounted(() => {
         </button>
       </div>
 
-      <!-- 记录列表 -->
-      <div v-if="showRecords && records.length" class="section records-section">
-        <h2>📈 运动记录</h2>
+      <!-- 运动记录列表 -->
+      <div v-if="showRecords && selectedUser" class="section records-section">
+        <h2>📝 运动记录</h2>
         <div class="records-list">
-          <div
-            v-for="record in records"
-            :key="record.id"
-            class="record-item"
-          >
-            <div class="record-content">
-              <span class="sport-type">{{ getSportLabel(record.sport_type) }}</span>
-              <span class="duration">⏱️ {{ record.duration }}分钟</span>
-              <span v-if="record.count" class="count">🔢 {{ record.count }}次</span>
-              <span class="date">📅 {{ formatDate(record.created_at) }}</span>
+          <div v-if="records.length === 0" class="no-records">
+            暂无运动记录
+          </div>
+          <div v-else class="record-items">
+            <div v-for="record in records" :key="record.id" class="record-item">
+              <div class="record-header">
+                <span class="sport-type">{{ getSportLabel(record.sport_type) }}</span>
+                <span class="record-time">运动时间：{{ formatDate(record.exercise_time) }}</span>
+              </div>
+              <div class="record-details">
+                <span class="duration">⏱️ {{ record.duration }}分钟</span>
+                <span v-if="record.count" class="count">🔢 {{ record.count }}次</span>
+              </div>
+              <div class="record-footer">
+                <span class="check-in-time">打卡时间：{{ formatDate(record.check_in_time) }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div v-if="showRecords && !records.length" class="no-records">
-        🤔 暂无运动记录
       </div>
     </div>
   </div>
@@ -472,9 +520,24 @@ onMounted(() => {
   margin-top: 1rem;
 }
 
+.records-section {
+  margin-top: 2rem;
+}
+
 .records-list {
-  display: flex;
-  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.no-records {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.record-items {
+  display: grid;
   gap: 1rem;
 }
 
@@ -509,11 +572,11 @@ onMounted(() => {
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
-.record-content {
+.record-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  margin-bottom: 1rem;
 }
 
 .sport-type {
@@ -521,6 +584,17 @@ onMounted(() => {
   color: #5a67d8;
   font-size: 1.1rem;
   text-shadow: 0 1px 2px rgba(90, 103, 216, 0.2);
+}
+
+.record-time {
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.record-details {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .duration,
@@ -533,23 +607,19 @@ onMounted(() => {
   font-size: 0.9rem;
 }
 
-.date {
-  margin-left: auto;
+.record-footer {
   color: #4a5568;
   font-size: 0.85rem;
-  font-weight: 500;
-  opacity: 0.8;
+  font-style: italic;
 }
 
-.no-records {
-  text-align: center;
-  color: #4a5568;
-  padding: 3rem;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  font-size: 1.2rem;
-  font-weight: 500;
+.input[type="datetime-local"] {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 @media (max-width: 640px) {
@@ -571,14 +641,10 @@ onMounted(() => {
     min-width: auto;
   }
 
-  .record-content {
+  .record-header,
+  .record-details {
     flex-direction: column;
-    align-items: flex-start;
     gap: 0.5rem;
-  }
-
-  .date {
-    margin-left: 0;
   }
   
   .floating-icon {

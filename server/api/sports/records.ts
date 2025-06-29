@@ -36,9 +36,9 @@ export default defineEventHandler(async (event) => {
 
       console.log('正在查询用户运动记录...')
       const records = await db.prepare(
-        'SELECT * FROM sports_records WHERE user_id = ? ORDER BY created_at DESC'
+        'SELECT * FROM sports_records WHERE user_id = ? ORDER BY exercise_time DESC'
       ).bind(userId).all()
-      console.log('运动记录查询结果:', records)
+      console.log('用户运动记录查询结果:', records)
       
       return { results: records.results }
     } catch (error) {
@@ -56,9 +56,9 @@ export default defineEventHandler(async (event) => {
     try {
       const body = await readBody(event)
       console.log('创建运动记录请求体:', body)
-      const { userId, sportType, duration, count } = body
+      const { userId, sportType, duration, count, exerciseTime } = body
       
-      if (!userId || !sportType || !duration) {
+      if (!userId || !sportType || !duration || !exerciseTime) {
         throw createError({
           statusCode: 400,
           statusMessage: '缺少必要参数'
@@ -67,8 +67,8 @@ export default defineEventHandler(async (event) => {
 
       console.log('正在创建运动记录...')
       const result = await db.prepare(
-        'INSERT INTO sports_records (user_id, sport_type, duration, count) VALUES (?, ?, ?, ?) RETURNING *'
-      ).bind(userId, sportType, duration, count || null).all()
+        'INSERT INTO sports_records (user_id, sport_type, duration, count, exercise_time, check_in_time) VALUES (?, ?, ?, ?, ?, datetime("now")) RETURNING *'
+      ).bind(userId, sportType, duration, count || null, exerciseTime).all()
       console.log('创建运动记录结果:', result)
       
       setResponseStatus(event, 201)
