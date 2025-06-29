@@ -54,11 +54,15 @@ const createUser = async () => {
       body: JSON.stringify({ nickname: nickname.value })
     })
     console.log('创建用户响应:', response)
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
+    
     const data = await response.json()
     console.log('创建用户数据:', data)
+    
+    if (!response.ok) {
+      const errorMessage = data.statusMessage || data.data?.details || `HTTP error! status: ${response.status}`
+      alert(`创建用户失败: ${errorMessage}`)
+      return
+    }
     
     if (data.error) {
       alert(data.error)
@@ -69,10 +73,12 @@ const createUser = async () => {
       users.value.unshift(data.results[0])
       selectedUser.value = data.results[0]
       nickname.value = ''
+    } else {
+      alert('创建用户成功，但返回数据格式异常')
     }
   } catch (error) {
     console.error('创建用户失败:', error)
-    alert('创建用户失败，请重试')
+    alert(`创建用户失败: ${error instanceof Error ? error.message : '未知错误'}`)
   }
 }
 
