@@ -49,6 +49,17 @@
     <div v-if="successMessage" class="success-message">
       {{ successMessage }}
     </div>
+    
+    <!-- 游戏说明 -->
+    <div class="instructions">
+      <h4>How to Play</h4>
+      <div class="instructions-content">
+        <p><strong>Pick Bottle:</strong> Click to pick up a bottle from the sea</p>
+        <p><strong>Write Bottle:</strong> Write your message and throw it into the sea</p>
+        <p><strong>Throw Back:</strong> Put the bottle back into the sea for others to find</p>
+        <p><strong>Close:</strong> Close the bottle and keep it private</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -453,5 +464,51 @@ textarea::placeholder {
   10% { opacity: 1; transform: translate(-50%, 0); }
   90% { opacity: 1; transform: translate(-50%, 0); }
   100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+.instructions {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 300px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.instructions h4 {
+  margin: 0 0 15px 0;
+  color: #1a365d;
+  font-size: 18px;
+  font-weight: bold;
+  border-bottom: 2px solid #0077BE;
+  padding-bottom: 10px;
+}
+
+.instructions-content {
+  color: #2d3748;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.instructions-content p {
+  margin: 10px 0;
+}
+
+.instructions-content strong {
+  color: #0077BE;
+}
+
+@media (max-width: 768px) {
+  .instructions {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    margin: 20px;
+    max-width: 100%;
+  }
 }
 </style> 

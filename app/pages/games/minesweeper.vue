@@ -354,6 +354,17 @@ onUnmounted(() => {
           {{ isSoundEnabled ? '🔊 Sound: On' : '🔈 Sound: Off' }}
         </button>
       </div>
+      
+      <!-- 游戏说明 -->
+      <div class="instructions">
+        <h4>How to Play</h4>
+        <div class="instructions-content">
+          <p><strong>Left Click:</strong> Reveal a cell</p>
+          <p><strong>Right Click:</strong> Mark/unmark a mine</p>
+          <p><strong>Mark Mode:</strong> Toggle marking mode</p>
+          <p><strong>Goal:</strong> Find all non-mine cells without triggering any mines</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -535,7 +546,43 @@ onUnmounted(() => {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
   }
-  
+}
 
+.instructions {
+  margin-top: 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  text-align: left;
+}
+
+.instructions h4 {
+  margin: 0 0 1rem 0;
+  color: #374151;
+  font-size: 1.1rem;
+  text-align: center;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 0.5rem;
+}
+
+.instructions-content {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.instructions-content p {
+  margin: 0.5rem 0;
+}
+
+.instructions-content strong {
+  color: #667eea;
+}
+
+@media (max-width: 768px) {
+  .instructions {
+    padding: 1rem;
+    font-size: 0.875rem;
+  }
 }
 </style> 

@@ -21,10 +21,6 @@ let gameLoopId: number
 let startTime = 0
 const pauseTime = 0
 
-// 触摸控制
-const joystickPosition = ref({ x: 0, y: 0 })
-const joystickActive = ref(false)
-const joystickBasePosition = { x: 0, y: 0 }
 
 // 玩家对象
 const player = ref({
@@ -146,19 +142,19 @@ function resetGameState() {
 
 // 控制玩家
 function controlPlayer() {
-  if (keys['ArrowLeft'] || keys['a'] || keys['A'] || (joystickActive.value && joystickPosition.value.x < -10)) {
+  if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
     player.value.x = Math.max(0, player.value.x - player.value.speed)
   }
-  if (keys['ArrowRight'] || keys['d'] || keys['D'] || (joystickActive.value && joystickPosition.value.x > 10)) {
+  if (keys['ArrowRight'] || keys['d'] || keys['D']) {
     player.value.x = Math.min(1200 - player.value.width, player.value.x + player.value.speed)
   }
-  if (keys['ArrowUp'] || keys['w'] || keys['W'] || (joystickActive.value && joystickPosition.value.y < -10)) {
+  if (keys['ArrowUp'] || keys['w'] || keys['W']) {
     player.value.y = Math.max(0, player.value.y - player.value.speed)
   }
-  if (keys['ArrowDown'] || keys['s'] || keys['S'] || (joystickActive.value && joystickPosition.value.y > 10)) {
+  if (keys['ArrowDown'] || keys['s'] || keys['S']) {
     player.value.y = Math.min(800 - player.value.height, player.value.y + player.value.speed)
   }
-  if ((keys[' '] || keys['e'] || keys['E']) && player.value.canShoot && !player.value.reloading && player.value.ammo > 0) {
+  if (keys[' '] && player.value.canShoot && !player.value.reloading && player.value.ammo > 0) {
     shoot()
   }
 }
@@ -476,24 +472,6 @@ function gameLoop() {
     if (enemy.y > 800) enemies.splice(i, 1)
   })
   
-  // 绘制操作杆
-  if (joystickActive.value) {
-    // 绘制操作杆基座
-    ctx.beginPath()
-    ctx.arc(joystickBasePosition.x, joystickBasePosition.y, 50, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'
-    ctx.fill()
-    
-    // 绘制操作杆控制点
-    ctx.beginPath()
-    ctx.arc(
-      joystickBasePosition.x + joystickPosition.value.x, 
-      joystickBasePosition.y + joystickPosition.value.y, 
-      30, 0, Math.PI * 2
-    )
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-    ctx.fill()
-  }
 
   // 更新爆炸效果
   updateExplosions()
@@ -536,6 +514,17 @@ function togglePause() {
   paused.value = !paused.value
 }
 
+// 手动换弹
+function manualReload() {
+  if (!player.value.reloading && !gameOver.value) {
+    player.value.reloading = true
+    player.value.ammo = 30
+    setTimeout(() => {
+      player.value.reloading = false
+    }, 2000)
+  }
+}
+
 // 重新开始游戏
 function restartGame() {
   if (gameLoopId) {
@@ -545,119 +534,6 @@ function restartGame() {
   initGame()
 }
 
-// 触屏事件处理
-function handleTouchStart(e: TouchEvent) {
-  const touch = e.touches[0]
-  const rect = gameCanvas.value!.getBoundingClientRect()
-  const x = touch.clientX - rect.left
-  const y = touch.clientY - rect.top
-  
-  // 左半边屏幕触发操作杆
-  if (x < rect.width / 2) {
-    joystickActive.value = true
-    joystickBasePosition.x = x
-    joystickBasePosition.y = y
-    joystickPosition.value = { x: 0, y: 0 }
-  } 
-  // 右半边屏幕触发射击
-  else if (player.value.canShoot && !player.value.reloading && player.value.ammo > 0) {
-    shoot()
-  }
-  
-  e.preventDefault()
-}
-
-function handleTouchMove(e: TouchEvent) {
-  if (!joystickActive.value) return
-  
-  const touch = e.touches[0]
-  const rect = gameCanvas.value!.getBoundingClientRect()
-  const x = touch.clientX - rect.left
-  const y = touch.clientY - rect.top
-  
-  // 计算操作杆位置
-  let deltaX = x - joystickBasePosition.x
-  let deltaY = y - joystickBasePosition.y
-  
-  // 限制操作杆移动范围
-  const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
-  if (distance > 50) {
-    deltaX = deltaX / distance * 50
-    deltaY = deltaY / distance * 50
-  }
-  
-  joystickPosition.value = { x: deltaX, y: deltaY }
-  e.preventDefault()
-}
-
-function handleTouchEnd() {
-  joystickActive.value = false
-}
-
-// 操作杆UI控制
-function handleJoystickStart(e: TouchEvent) {
-  joystickActive.value = true
-  
-  // 防止事件冒泡
-  e.preventDefault()
-  e.stopPropagation()
-  
-  // 初始化操作杆位置
-  handleJoystickMove(e)
-}
-
-function handleJoystickMove(e: TouchEvent) {
-  if (!joystickActive.value) return
-  
-  // 防止事件冒泡
-  e.preventDefault()
-  e.stopPropagation()
-  
-  const touch = e.touches[0]
-  const joystick = e.currentTarget as HTMLElement
-  const rect = joystick.getBoundingClientRect()
-  
-  // 计算相对于操作杆中心的位置
-  const centerX = rect.left + rect.width / 2
-  const centerY = rect.top + rect.height / 2
-  
-  // 计算偏移量
-  let deltaX = touch.clientX - centerX
-  let deltaY = touch.clientY - centerY
-  
-  // 限制操作杆移动范围
-  const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
-  const maxDistance = rect.width / 2 - 10
-  
-  if (distance > maxDistance) {
-    deltaX = deltaX / distance * maxDistance
-    deltaY = deltaY / distance * maxDistance
-  }
-  
-  // 更新操作杆位置
-  const joystickTip = joystick.querySelector('.joystick-tip') as HTMLElement
-  if (joystickTip) {
-    joystickTip.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`
-  }
-  
-  // 更新控制数据
-  joystickPosition.value = { x: deltaX, y: deltaY }
-}
-
-function handleJoystickEnd(e: TouchEvent) {
-  // 防止事件冒泡
-  e.preventDefault()
-  e.stopPropagation()
-  
-  joystickActive.value = false
-  joystickPosition.value = { x: 0, y: 0 }
-  
-  // 重置操作杆位置
-  const joystickTip = document.querySelector('.joystick-tip') as HTMLElement
-  if (joystickTip) {
-    joystickTip.style.transform = 'translate(-50%, -50%)'
-  }
-}
 
 // 键盘事件处理
 function handleKeyDown(e: KeyboardEvent) {
@@ -666,9 +542,14 @@ function handleKeyDown(e: KeyboardEvent) {
   // E键暂停/继续游戏
   if (e.key === 'e' || e.key === 'E') {
     togglePause()
+    e.preventDefault()
   }
   
-  e.preventDefault()
+  // R键手动换弹
+  if (e.key === 'r' || e.key === 'R') {
+    manualReload()
+    e.preventDefault()
+  }
 }
 
 function handleKeyUp(e: KeyboardEvent) {
@@ -683,11 +564,6 @@ onMounted(() => {
     // 添加键盘事件监听
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
-    
-    // 添加触摸事件监听
-    gameCanvas.value.addEventListener('touchstart', handleTouchStart)
-    gameCanvas.value.addEventListener('touchmove', handleTouchMove)
-    gameCanvas.value.addEventListener('touchend', handleTouchEnd)
   }
 })
 
@@ -697,12 +573,6 @@ onUnmounted(() => {
   }
   window.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('keyup', handleKeyUp)
-  
-  if (gameCanvas.value) {
-    gameCanvas.value.removeEventListener('touchstart', handleTouchStart)
-    gameCanvas.value.removeEventListener('touchmove', handleTouchMove)
-    gameCanvas.value.removeEventListener('touchend', handleTouchEnd)
-  }
 })
 </script>
 
@@ -730,33 +600,14 @@ onUnmounted(() => {
       <button class="restart-btn" @click="restartGame">Play Again</button>
     </div>
 
-    <!-- 暂停按钮 -->
-    <button v-if="!gameOver" class="pause-btn" @click="togglePause">
-      {{ paused ? 'Continue' : 'Pause' }}
-    </button>
-
-    <!-- 触屏控制 -->
-    <div v-if="!gameOver && !paused" class="touch-controls">
-      <!-- 左侧操作杆 -->
-      <div
-class="joystick-area" 
-           @touchstart="handleJoystickStart" 
-           @touchmove="handleJoystickMove" 
-           @touchend="handleJoystickEnd">
-        <div class="joystick-base"/>
-        <div
-class="joystick-tip" :style="{ 
-          transform: `translate(-50%, -50%)` 
-        }"/>
-      </div>
-      
-      <!-- 右侧发射按钮 -->
-      <div
-class="fire-btn" 
-           @touchstart.prevent="shoot" 
-           @touchend.prevent="() => {}" 
-           @touchmove.prevent="() => {}">
-        <span>Fire</span>
+    <!-- 控制说明 -->
+    <div v-if="!gameOver" class="instructions">
+      <h4>Controls</h4>
+      <div class="instructions-content">
+        <p><strong>Movement:</strong> Arrow Keys or WASD</p>
+        <p><strong>Shoot:</strong> Space</p>
+        <p><strong>Pause:</strong> E</p>
+        <p><strong>Reload:</strong> R</p>
       </div>
     </div>
 
@@ -801,29 +652,6 @@ canvas {
 
 .hud div {
   margin: 5px 0;
-}
-
-.pause-btn {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #330867;
-  color: white;
-  border: none;
-  padding: 15px 30px;
-  font-size: 20px;
-  border-radius: 30px;
-  cursor: pointer;
-  font-family: 'Arial', sans-serif;
-  box-shadow: 0 0 15px #30cfd0;
-  transition: all 0.3s ease;
-  z-index: 50;
-}
-
-.pause-btn:hover {
-  background: #30cfd0;
-  box-shadow: 0 0 25px #30cfd0;
 }
 
 .game-over-screen {
@@ -871,79 +699,51 @@ canvas {
   box-shadow: 0 0 25px #30cfd0;
 }
 
-/* 触屏控制样式 */
-.touch-controls {
+/* 控制说明 */
+.instructions {
   position: fixed;
-  bottom: 120px; /* 调整位置，避免与暂停按钮冲突 */
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #30cfd0;
   z-index: 50;
-  pointer-events: none;
+  color: #30cfd0;
+  min-width: 200px;
+  box-shadow: 0 0 10px rgba(48, 207, 208, 0.5);
 }
 
-.joystick-area {
-  position: relative;
-  width: 120px;
-  height: 120px;
-  margin-left: 30px; /* 增加左边距 */
-  pointer-events: auto;
+.instructions h4 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  text-shadow: 0 0 5px #30cfd0;
+  border-bottom: 1px solid rgba(48, 207, 208, 0.3);
+  padding-bottom: 8px;
 }
 
-.joystick-base {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+.instructions-content {
+  font-size: 14px;
 }
 
-.joystick-tip {
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.fire-btn {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: rgba(255, 0, 0, 0.5);
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 30px; /* 增加右边距 */
-  pointer-events: auto;
-  cursor: pointer;
-}
-
-.fire-btn span {
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+.instructions-content p {
+  margin: 5px 0;
+  line-height: 1.4;
 }
 
 /* 生命值进度条 */
 .health-bar {
   position: fixed;
-  top: 50px;
-  right: 10px;
+  top: 20px;
+  right: 20px;
   width: 30px;
   height: 200px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   border: 2px solid #30cfd0;
   border-radius: 15px;
   overflow: hidden;
   z-index: 50;
+  box-shadow: 0 0 10px rgba(48, 207, 208, 0.5);
 }
 
 .health-fill {
@@ -957,7 +757,7 @@ canvas {
 @media (max-width: 1200px) {
   canvas {
     max-width: 100vw;
-    max-height: 60vh; /* 减小画布高度，为控制留出更多空间 */
+    max-height: 80vh;
     width: auto;
     height: auto;
   }
@@ -965,17 +765,24 @@ canvas {
   .hud {
     font-size: 14px;
     padding: 10px;
+    max-width: 180px;
   }
   
-  .pause-btn {
-    padding: 12px 24px;
-    font-size: 18px;
-    bottom: 130px; /* 调整暂停按钮位置，避免与操作杆冲突 */
+  .health-bar {
+    width: 25px;
+    height: 150px;
+    top: 15px;
+    right: 15px;
   }
   
-  /* 调整触屏控制位置 */
-  .touch-controls {
-    bottom: 20px;
+  .instructions {
+    font-size: 12px;
+    padding: 10px;
+    min-width: 160px;
+  }
+  
+  .instructions-content {
+    font-size: 12px;
   }
 }
 </style> 
