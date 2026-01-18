@@ -112,9 +112,9 @@ const endGame = () => {
   }
   
   // 记录成绩
-  recordGameScore('打字挑战', score.value)
+  recordGameScore('Typing Challenge', score.value)
   
-  const result = confirm(`游戏结束！\n最终得分：${score.value}\n正确率：${accuracy.value}%\n速度：${wpm.value} WPM\n\n点击确定重新开始，取消返回主页`)
+  const result = confirm(`Game Over!\nFinal Score: ${score.value}\nAccuracy: ${accuracy.value}%\nSpeed: ${wpm.value} WPM\n\nClick OK to restart, Cancel to return to homepage`)
   if (result) {
     startGame()
   } else {
@@ -194,7 +194,7 @@ onUnmounted(() => {
 
 
     <div class="game-container">
-      <h1 class="game-title">打字挑战</h1>
+      <h1 class="game-title">Typing Challenge</h1>
       
       <!-- 模式选择 -->
       <div class="mode-selector" v-if="!gameRunning">
@@ -204,39 +204,39 @@ onUnmounted(() => {
             :class="{ active: gameMode === 'chinese' }"
             @click="switchMode('chinese')"
           >
-            中文模式
+            Chinese Mode
           </button>
           <button 
             class="mode-button" 
             :class="{ active: gameMode === 'english' }"
             @click="switchMode('english')"
           >
-            英文模式
+            English Mode
           </button>
         </div>
       </div>
       
       <!-- 当前模式显示 -->
       <div class="current-mode" v-if="gameRunning">
-        <span class="mode-indicator">当前模式：{{ gameMode === 'chinese' ? '中文' : '英文' }}</span>
+        <span class="mode-indicator">Current Mode: {{ gameMode === 'chinese' ? 'Chinese' : 'English' }}</span>
       </div>
       
       <!-- 统计信息 -->
       <div class="stats">
         <div class="stat-item">
-          <span class="stat-label">得分:</span>
+          <span class="stat-label">Score:</span>
           <span class="stat-value">{{ score }}</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">时间:</span>
-          <span class="stat-value">{{ timeLeft }}秒</span>
+          <span class="stat-label">Time:</span>
+          <span class="stat-value">{{ timeLeft }}s</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">速度:</span>
+          <span class="stat-label">Speed:</span>
           <span class="stat-value">{{ wpm }} WPM</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">正确率:</span>
+          <span class="stat-label">Accuracy:</span>
           <span class="stat-value">{{ accuracy }}%</span>
         </div>
       </div>
@@ -252,7 +252,7 @@ onUnmounted(() => {
             v-model="userInput"
             type="text"
             class="word-input"
-            :placeholder="`输入 '${currentWord}' 然后按回车`"
+            :placeholder="`Type '${currentWord}' and press Enter`"
             autofocus
           >
         </div>
@@ -261,19 +261,19 @@ onUnmounted(() => {
       <!-- 开始按钮 -->
       <div class="controls" v-else>
         <button class="start-button" @click="startGame">
-          {{ timeLeft === 60 ? '开始游戏' : '重新开始' }}
+          {{ timeLeft === 60 ? 'Start Game' : 'Restart' }}
         </button>
       </div>
       
       <!-- 游戏说明 -->
       <div class="instructions">
-        <h3>游戏说明</h3>
+        <h3>Instructions</h3>
         <ul>
-          <li>选择中文或英文打字模式</li>
-          <li>在输入框中输入显示的词汇</li>
-          <li>输入完成后按回车键确认</li>
-          <li>正确输入获得分数，错误不得分</li>
-          <li>挑战你的打字速度和准确率！</li>
+          <li>Select Chinese or English typing mode</li>
+          <li>Type the displayed word in the input box</li>
+          <li>Press Enter after typing to confirm</li>
+          <li>Correct typing earns points, incorrect typing earns no points</li>
+          <li>Challenge your typing speed and accuracy!</li>
         </ul>
       </div>
     </div>

@@ -1,194 +1,194 @@
-# AndyGame - 游戏中心
+# AndyGame - Game Center
 
-一个基于 Nuxt.js 3 和 Cloudflare Workers 的现代化全栈游戏平台，提供多种在线小游戏和互动功能。
-nodejs 
+A modern full-stack gaming platform based on Nuxt.js 3 and Cloudflare Workers, offering multiple online mini-games and interactive features.
+nodejs
 
-##🎮 项目特色
+## 🎮 Features
 
-- **多样化游戏集合**：包含7款经典小游戏
-- **全栈架构**：前后端一体化开发
-- **云原生部署**：基于 Cloudflare Workers 的边缘计算
-- **现代化UI**：使用 Element Plus 和 UnoCSS
-- **响应式设计**：支持多设备访问
+- **Diverse Game Collection**: Includes 7 classic mini-games
+- **Full-Stack Architecture**: Integrated frontend and backend development
+- **Cloud-Native Deployment**: Edge computing based on Cloudflare Workers
+- **Modern UI**: Using Element Plus and UnoCSS
+- **Responsive Design**: Supports multi-device access
 
-## 🎯 功能特性
+## 🎯 Functionality
 
-### 🕹️ 游戏中心
-- **漂流瓶游戏** (`bottle.vue`) - 社交互动游戏
-- **坦克大战** (`tank.vue`) - 经典射击游戏  
-- **打字练习** (`typing.vue`) - 提升打字速度
-- **钓鱼游戏** (`fishing.vue`) - 休闲娱乐
-- **扫雷游戏** (`minesweeper.vue`) - 逻辑推理
-- **飞机大战** (`plane.vue`) - 动作射击
-- **贪吃蛇** (`snake.vue`) - 经典街机
+### 🕹️ Game Center
+- **Bottle Game** (`bottle.vue`) - Social interaction game
+- **Tank Battle** (`tank.vue`) - Classic shooting game
+- **Typing Practice** (`typing.vue`) - Improve typing speed
+- **Fishing Game** (`fishing.vue`) - Casual entertainment
+- **Minesweeper** (`minesweeper.vue`) - Logic puzzle
+- **Plane Battle** (`plane.vue`) - Action shooting
+- **Snake Game** (`snake.vue`) - Classic arcade
 
-### 📊 数据管理
-- **运动记录追踪** - 记录用户运动数据
-- **运动类型管理** - 支持多种运动类型
-- **文件上传功能** - 支持图片和文档上传
+### 📊 Data Management
+- **Sports Records Tracking** - Record user sports data
+- **Sport Types Management** - Support for multiple sport types
+- **File Upload Feature** - Support for image and document uploads
 
-### 🎨 界面特性
-- **暗黑模式切换** - 支持明暗主题
-- **响应式布局** - 适配各种屏幕尺寸
-- **现代化UI组件** - 基于 Element Plus
+### 🎨 Interface Features
+- **Dark Mode Toggle** - Support for light and dark themes
+- **Responsive Layout** - Adapts to various screen sizes
+- **Modern UI Components** - Based on Element Plus
 
-## 🛠️ 技术栈
+## 🛠️ Tech Stack
 
-### 前端技术
-- **框架**: [Nuxt.js 3](https://nuxt.com/) - Vue.js 全栈框架
-- **UI库**: [Element Plus](https://element-plus.org/) - Vue 3 组件库
-- **样式**: [UnoCSS](https://unocss.dev/) - 原子化CSS引擎
-- **状态管理**: [Pinia](https://pinia.vuejs.org/) - Vue 状态管理
-- **图标**: [Element Plus Icons](https://element-plus.org/zh-CN/component/icon.html)
-- **工具库**: [VueUse](https://vueuse.org/) - Vue 组合式API工具集
+### Frontend Technologies
+- **Framework**: [Nuxt.js 3](https://nuxt.com/) - Vue.js full-stack framework
+- **UI Library**: [Element Plus](https://element-plus.org/) - Vue 3 component library
+- **Styling**: [UnoCSS](https://unocss.dev/) - Atomic CSS engine
+- **State Management**: [Pinia](https://pinia.vuejs.org/) - Vue state management
+- **Icons**: [Element Plus Icons](https://element-plus.org/zh-CN/component/icon.html)
+- **Utility Library**: [VueUse](https://vueuse.org/) - Vue Composition API utilities
 
-### 后端技术
-- **运行时**: [Cloudflare Workers](https://workers.cloudflare.com/) - 边缘计算平台
-- **数据库**: [Cloudflare D1](https://developers.cloudflare.com/d1/) - SQLite 数据库
-- **存储**: [Cloudflare R2](https://developers.cloudflare.com/r2/) - 对象存储
-- **API**: Nuxt 3 服务器API
+### Backend Technologies
+- **Runtime**: [Cloudflare Workers](https://workers.cloudflare.com/) - Edge computing platform
+- **Database**: [Cloudflare D1](https://developers.cloudflare.com/d1/) - SQLite database
+- **Storage**: [Cloudflare R2](https://developers.cloudflare.com/r2/) - Object storage
+- **API**: Nuxt 3 Server API
 
-### 开发工具
-- **语言**: TypeScript
-- **包管理**: pnpm
-- **代码检查**: ESLint
-- **样式预处理**: Sass/SCSS
-- **部署工具**: Wrangler CLI
+### Development Tools
+- **Language**: TypeScript
+- **Package Manager**: pnpm
+- **Linting**: ESLint
+- **Style Preprocessing**: Sass/SCSS
+- **Deployment Tool**: Wrangler CLI
 
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
 AndyGame-1/
-├── app/                          # 应用源码
-│   ├── components/              # Vue 组件
-│   │   ├── example/            # 示例组件
-│   │   ├── DarkToggle.vue      # 暗黑模式切换
-│   │   ├── FileUpload.vue      # 文件上传组件
+├── app/                          # Application source code
+│   ├── components/              # Vue components
+│   │   ├── example/            # Example components
+│   │   ├── DarkToggle.vue      # Dark mode toggle
+│   │   ├── FileUpload.vue      # File upload component
 │   │   └── ...
-│   ├── layouts/                # 布局组件
-│   │   ├── default.vue         # 默认布局
-│   │   ├── game.vue           # 游戏布局
-│   │   └── home.vue           # 首页布局
-│   ├── pages/                  # 页面路由
-│   │   ├── games/             # 游戏页面
-│   │   │   ├── bottle.vue     # 漂流瓶游戏
-│   │   │   ├── tank.vue       # 坦克大战
-│   │   │   ├── snake.vue      # 贪吃蛇
+│   ├── layouts/                # Layout components
+│   │   ├── default.vue         # Default layout
+│   │   ├── game.vue           # Game layout
+│   │   └── home.vue           # Home layout
+│   ├── pages/                  # Page routes
+│   │   ├── games/             # Game pages
+│   │   │   ├── bottle.vue     # Bottle game
+│   │   │   ├── tank.vue       # Tank battle
+│   │   │   ├── snake.vue      # Snake game
 │   │   │   └── ...
-│   │   ├── sports.vue         # 运动记录
+│   │   ├── sports.vue         # Sports records
 │   │   └── ...
-│   ├── stores/                 # Pinia 状态管理
-│   ├── composables/           # 组合式函数
-│   ├── assets/                # 静态资源
-│   └── constants/             # 常量定义
-├── server/                      # 服务器API
-│   └── api/                    # API 接口
-│       ├── bottle/            # 漂流瓶API
-│       ├── files/             # 文件管理API
-│       ├── sports/            # 运动记录API
-│       └── sport-types.ts     # 运动类型API
-├── migrations/                  # 数据库迁移
-├── public/                     # 公共静态文件
-├── nuxt.config.ts             # Nuxt 配置
-├── wrangler.toml              # Cloudflare Workers 配置
-└── package.json               # 项目依赖
+│   ├── stores/                 # Pinia state management
+│   ├── composables/           # Composable functions
+│   ├── assets/                # Static assets
+│   └── constants/             # Constant definitions
+├── server/                      # Server API
+│   └── api/                    # API endpoints
+│       ├── bottle/            # Bottle API
+│       ├── files/             # File management API
+│       ├── sports/            # Sports records API
+│       └── sport-types.ts     # Sport types API
+├── migrations/                  # Database migrations
+├── public/                     # Public static files
+├── nuxt.config.ts             # Nuxt configuration
+├── wrangler.toml              # Cloudflare Workers configuration
+└── package.json               # Project dependencies
 ```
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 环境要求
+### Requirements
 - Node.js 18+
 - pnpm 8+
-- Cloudflare 账户
+- Cloudflare account
 
-### 1. 克隆项目
+### 1. Clone the project
 ```bash
 git clone <repository-url>
 cd AndyGame-1
 ```
 
-### 2. 安装依赖
+### 2. Install dependencies
 ```bash
 pnpm install
 ```
 
-### 3. 配置环境
+### 3. Configure environment
 
-#### 3.1 Cloudflare D1 数据库
+#### 3.1 Cloudflare D1 Database
 ```bash
-# 创建 D1 数据库
+# Create D1 database
 wrangler d1 create andydb
 
-# 运行数据库迁移
+# Run database migrations
 wrangler d1 migrations apply andydb --local
 wrangler d1 migrations apply andydb --remote
 ```
 
-#### 3.2 Cloudflare R2 存储
+#### 3.2 Cloudflare R2 Storage
 ```bash
-# 创建 R2 存储桶
+# Create R2 storage bucket
 wrangler r2 bucket create andy-game-assets
 ```
 
-#### 3.3 更新 wrangler.toml
-确保 `wrangler.toml` 中的数据库ID和存储桶名称正确。
+#### 3.3 Update wrangler.toml
+Make sure the database ID and bucket name in `wrangler.toml` are correct.
 
-### 4. 本地开发
+### 4. Local Development
 
-#### 4.1 构建项目
+#### 4.1 Build the project
 ```bash
 pnpm build
 ```
 
-#### 4.2 启动开发服务器
+#### 4.2 Start development server
 ```bash
 wrangler dev .output/server/index.mjs --site .output/public --local --port 8787
 ```
 
-访问 `http://localhost:8787` 查看应用。
+Visit `http://localhost:8787` to view the application.
 
-### 5. 部署到生产环境
+### 5. Deploy to Production
 
-#### 5.1 部署到 Cloudflare Workers
+#### 5.1 Deploy to Cloudflare Workers
 ```bash
 npx wrangler deploy
 ```
 
-## 📚 可用脚本
+## 📚 Available Scripts
 
 ```bash
-# 开发模式（Nuxt 开发服务器）
+# Development mode (Nuxt dev server)
 pnpm dev
 
-# 构建项目
+# Build project
 pnpm build
 
-# 本地预览构建结果
+# Preview build locally
 pnpm preview
 
-# 代码检查
+# Lint code
 pnpm lint
 
-# 修复代码格式
+# Fix code formatting
 pnpm lint:fix
 
-# 类型检查
+# Type check
 pnpm typecheck
 
-# 部署到 Cloudflare
+# Deploy to Cloudflare
 pnpm deploy
 ```
 
-## 🎯 部署架构
+## 🎯 Deployment Architecture
 
 ```mermaid
 graph TB
-    A[用户请求] --> B[Cloudflare CDN]
+    A[User Request] --> B[Cloudflare CDN]
     B --> C[Cloudflare Workers]
     C --> D[Nuxt.js SSR]
     C --> E[API Routes]
-    E --> F[D1 数据库]
-    C --> G[R2 存储]
+    E --> F[D1 Database]
+    C --> G[R2 Storage]
     
     subgraph "Cloudflare Edge"
         B
@@ -198,29 +198,29 @@ graph TB
     end
 ```
 
-### 部署特点
-- **边缘计算**: 代码在全球边缘节点运行，响应速度快
-- **无服务器**: 按需运行，自动扩缩容
-- **全球CDN**: 静态资源全球分发
-- **D1数据库**: 分布式SQLite数据库
-- **R2存储**: 对象存储，支持大文件
+### Deployment Features
+- **Edge Computing**: Code runs on global edge nodes with fast response times
+- **Serverless**: Runs on-demand with automatic scaling
+- **Global CDN**: Static assets distributed globally
+- **D1 Database**: Distributed SQLite database
+- **R2 Storage**: Object storage supporting large files
 
-## 🔧 配置说明
+## 🔧 Configuration
 
-### Nuxt 配置 (`nuxt.config.ts`)
-- **SSR模式**: 服务器端渲染
-- **Cloudflare预设**: 针对Workers优化
-- **TypeScript**: 完整类型支持
-- **自动导入**: 组件和组合式函数
+### Nuxt Configuration (`nuxt.config.ts`)
+- **SSR Mode**: Server-side rendering
+- **Cloudflare Preset**: Optimized for Workers
+- **TypeScript**: Full type support
+- **Auto-imports**: Components and composable functions
 
-### Cloudflare 配置 (`wrangler.toml`)
-- **D1数据库绑定**: `DB` 变量
-- **R2存储绑定**: `ASSETS` 变量
-- **环境配置**: 本地和生产环境
+### Cloudflare Configuration (`wrangler.toml`)
+- **D1 Database Binding**: `DB` variable
+- **R2 Storage Binding**: `ASSETS` variable
+- **Environment Configuration**: Local and production environments
 
-## 🗄️ 数据库结构
+## 🗄️ Database Schema
 
-### bottles 表 - 漂流瓶
+### bottles table - Message in a Bottle
 ```sql
 CREATE TABLE bottles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -231,7 +231,7 @@ CREATE TABLE bottles (
 );
 ```
 
-### sports_records 表 - 运动记录
+### sports_records table - Sports Records
 ```sql
 CREATE TABLE sports_records (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -244,34 +244,34 @@ CREATE TABLE sports_records (
 );
 ```
 
-## 🤝 贡献指南
+## 🤝 Contributing
 
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📝 许可证
+## 📝 License
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🔗 相关链接
+## 🔗 Related Links
 
-- [Nuxt.js 文档](https://nuxt.com/docs)
-- [Element Plus 文档](https://element-plus.org/)
-- [Cloudflare Workers 文档](https://developers.cloudflare.com/workers/)
-- [Cloudflare D1 文档](https://developers.cloudflare.com/d1/)
-- [UnoCSS 文档](https://unocss.dev/)
+- [Nuxt.js Documentation](https://nuxt.com/docs)
+- [Element Plus Documentation](https://element-plus.org/)
+- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
+- [Cloudflare D1 Documentation](https://developers.cloudflare.com/d1/)
+- [UnoCSS Documentation](https://unocss.dev/)
 
-## 📞 支持
+## 📞 Support
 
-如果您在使用过程中遇到问题，请：
+If you encounter any issues while using this project, please:
 
-1. 查看 [Issues](../../issues) 中是否已有相似问题
-2. 创建新的 Issue 描述您的问题
-3. 提供详细的错误信息和重现步骤
+1. Check if similar issues already exist in [Issues](../../issues)
+2. Create a new Issue describing your problem
+3. Provide detailed error information and steps to reproduce
 
 ---
 
-**享受游戏时光！** 🎮✨ 
+**Enjoy your gaming time!** 🎮✨

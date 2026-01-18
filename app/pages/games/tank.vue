@@ -27,10 +27,10 @@ let audioPool: HTMLAudioElement[] = []
 
 // 颜色名称映射
 const colorNames = {
-  '#FF4444': '红色',
-  '#44FF44': '绿色',
-  '#4444FF': '蓝色',
-  '#FF44FF': '粉色'
+  '#FF4444': 'Red',
+  '#44FF44': 'Green',
+  '#4444FF': 'Blue',
+  '#FF44FF': 'Pink'
 }
 
 // 控制方案
@@ -129,10 +129,10 @@ class Tank {
     // 弹药
     ctx.fillStyle = 'white'
     ctx.font = '12px Arial'
-    ctx.fillText(`弹药: ${this.ammo}`, this.x - 20, this.y - 20)
+    ctx.fillText(`Ammo: ${this.ammo}`, this.x - 20, this.y - 20)
     if (this.isReloading) {
       ctx.fillStyle = 'yellow'
-      ctx.fillText('换弹中...', this.x - 25, this.y - 45)
+      ctx.fillText('Reloading...', this.x - 25, this.y - 45)
     }
   }
 
@@ -301,11 +301,11 @@ function gameLoop() {
   if (aliveTanks.length === 1) {
     const winner = aliveTanks[0]
     victoryColor.value = winner.color
-    victoryMessage.value = `${colorNames[winner.color]}坦克胜利!`
+    victoryMessage.value = `${colorNames[winner.color]} Tank Wins!`
     
     // 记录游戏成绩
     const finalScore = Math.floor(100 + winner.health)
-    recordGameScore("坦克大战", finalScore)
+    recordGameScore("Tank Battle", finalScore)
     
     cancelAnimationFrame(gameLoopId)
     return
@@ -412,8 +412,8 @@ onUnmounted(() => {
 <template>
   <div class="tank-game">
     <div class="hud">
-      <button @click="togglePause" class="control-btn">{{ isPaused ? '继续' : '暂停' }}</button>
-      <button @click="restart" class="control-btn">重新开始</button>
+      <button @click="togglePause" class="control-btn">{{ isPaused ? 'Continue' : 'Pause' }}</button>
+      <button @click="restart" class="control-btn">Restart</button>
 
     </div>
 
@@ -427,24 +427,24 @@ onUnmounted(() => {
 
     <div class="game-container">
       <div class="controls-panel">
-        <h3>操作说明</h3>
+        <h3>Controls</h3>
         <div v-for="(scheme, index) in controlSchemes" :key="index" class="control-item" :style="{ border: `2px solid ${scheme.color}` }">
-          <strong :style="{ color: scheme.color }">{{ colorNames[scheme.color] }}坦克（玩家{{ index + 1 }}）:</strong><br>
-          前进：{{ scheme.controls.up }}<br>
-          后退：{{ scheme.controls.down }}<br>
-          左转：{{ scheme.controls.left }}<br>
-          右转：{{ scheme.controls.right }}<br>
-          射击：{{ scheme.controls.shoot }}
+          <strong :style="{ color: scheme.color }">{{ colorNames[scheme.color] }} Tank (Player {{ index + 1 }}):</strong><br>
+          Forward: {{ scheme.controls.up }}<br>
+          Backward: {{ scheme.controls.down }}<br>
+          Turn Left: {{ scheme.controls.left }}<br>
+          Turn Right: {{ scheme.controls.right }}<br>
+          Shoot: {{ scheme.controls.shoot }}
         </div>
       </div>
 
       <div class="game-wrapper">
         <!-- 玩家选择界面 -->
         <div v-if="showPlayerSelect" class="player-select">
-          <h2>选择玩家数量</h2>
-          <button @click="startGame(2)" class="player-btn">2 玩家</button>
-          <button @click="startGame(3)" class="player-btn">3 玩家</button>
-          <button @click="startGame(4)" class="player-btn">4 玩家</button>
+          <h2>Select Number of Players</h2>
+          <button @click="startGame(2)" class="player-btn">2 Players</button>
+          <button @click="startGame(3)" class="player-btn">3 Players</button>
+          <button @click="startGame(4)" class="player-btn">4 Players</button>
         </div>
 
         <!-- 胜利消息 -->

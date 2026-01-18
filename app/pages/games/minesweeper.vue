@@ -165,7 +165,7 @@ const toggleMark = (cell: any) => {
   if (!cell.isRevealed) {
     const currentMarked = grid.value.flat().filter(c => c.isMarked).length
     if (!cell.isMarked && currentMarked >= MINE_COUNT) {
-      alert('已达到最大标记数量！')
+      alert('Maximum number of marks reached!')
       return
     }
     cell.isMarked = !cell.isMarked
@@ -208,7 +208,7 @@ const revealAllMines = () => {
 
 // 显示游戏结束对话框
 const showGameOver = (isWin: boolean) => {
-  const message = isWin ? '恭喜！你赢得了游戏！' : '游戏结束！'
+  const message = isWin ? 'Congratulations! You won!' : 'Game Over!'
   const baseScore = Math.floor((60 - timeElapsed.value) * (isWin ? 100 : 50))
   const comboBonus = consecutiveCorrect.value * (isWin ? 50 : 25)
   const markingBonus = Math.floor((correctMarks.value / MINE_COUNT) * (isWin ? 1000 : 500))
@@ -218,7 +218,7 @@ const showGameOver = (isWin: boolean) => {
     0.5 + (correctMarks.value / MINE_COUNT) * 0.3 + (1 - timeElapsed.value / 60) * 0.2
   const finalScore = Math.floor((baseScore + comboBonus + markingBonus + efficiencyBonus) * difficultyMultiplier)
 
-  const result = confirm(`${message}\n\n基础得分: ${baseScore}\n连击奖励: ${comboBonus}\n标记奖励: ${markingBonus}\n效率奖励: ${efficiencyBonus}\n难度系数: ×${difficultyMultiplier.toFixed(2)}\n\n最终得分: ${finalScore}\n\n点击确定重新开始，取消返回主页`)
+  const result = confirm(`${message}\n\nBase Score: ${baseScore}\nCombo Bonus: ${comboBonus}\nMarking Bonus: ${markingBonus}\nEfficiency Bonus: ${efficiencyBonus}\nDifficulty Multiplier: ×${difficultyMultiplier.toFixed(2)}\n\nFinal Score: ${finalScore}\n\nClick OK to restart, Cancel to return to homepage`)
   
   if (result) {
     restartGame()
@@ -259,7 +259,7 @@ const toggleSound = () => {
 // 获取标记计数
 const getMarkCount = computed(() => {
   const marked = grid.value.flat().filter(c => c.isMarked).length
-  return `标记模式（${marked}/${MINE_COUNT}）`
+  return `Mark Mode (${marked}/${MINE_COUNT})`
 })
 
 // 获取单元格显示内容
@@ -305,7 +305,7 @@ onUnmounted(() => {
 
 
     <!-- 游戏标题 -->
-    <h1 class="game-title">扫雷游戏</h1>
+    <h1 class="game-title">Minesweeper</h1>
 
     <!-- 游戏容器 -->
     <div class="game-container">
@@ -341,7 +341,7 @@ onUnmounted(() => {
           class="button restart-button" 
           @click="restartGame"
         >
-          重新开始
+          Restart
         </button>
       </div>
 
@@ -351,7 +351,7 @@ onUnmounted(() => {
           class="sound-button" 
           @click="toggleSound"
         >
-          {{ isSoundEnabled ? '🔊 声音：开' : '🔈 声音：关' }}
+          {{ isSoundEnabled ? '🔊 Sound: On' : '🔈 Sound: Off' }}
         </button>
       </div>
     </div>

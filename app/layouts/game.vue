@@ -11,51 +11,51 @@
       <!-- 导航内容 -->
       <div class="sidebar-content" v-show="!sidebarCollapsed">
         <div class="sidebar-header">
-          <h3>🎮 游戏中心</h3>
+          <h3>🎮 Game Center</h3>
         </div>
 
         <!-- 返回主页按钮 -->
         <NuxtLink to="/" class="nav-item home-button">
-          🏠 返回主页
+          🏠 Home
         </NuxtLink>
 
         <!-- 游戏导航列表 -->
         <div class="game-nav">
-          <h4>游戏列表</h4>
+          <h4>Game List</h4>
           <NuxtLink to="/games/fishing" class="nav-item game-link">
-            🎣 深海捕鱼
+            🎣 Deep Sea Fishing
           </NuxtLink>
           <NuxtLink to="/games/snake" class="nav-item game-link">
-            🐍 贪吃蛇
+            🐍 Snake
           </NuxtLink>
           <NuxtLink to="/games/minesweeper" class="nav-item game-link">
-            💣 扫雷游戏
+            💣 Minesweeper
           </NuxtLink>
           <NuxtLink to="/games/plane" class="nav-item game-link">
-            ✈️ 飞机大战
+            ✈️ Plane Battle
           </NuxtLink>
           <NuxtLink to="/games/tank" class="nav-item game-link">
-            🚗 坦克大战
+            🚗 Tank Battle
           </NuxtLink>
           <NuxtLink to="/games/typing" class="nav-item game-link">
-            ⌨️ 打字挑战
+            ⌨️ Typing Challenge
           </NuxtLink>
           <NuxtLink to="/games/bottle" class="nav-item game-link">
-            🍾 漂流瓶
+            🍾 Message in a Bottle
           </NuxtLink>
         </div>
       </div>
 
       <!-- 折叠状态下的快捷图标 -->
       <div class="sidebar-icons" v-show="sidebarCollapsed">
-        <NuxtLink to="/" class="icon-button" title="返回主页">🏠</NuxtLink>
-        <NuxtLink to="/games/fishing" class="icon-button" title="深海捕鱼">🎣</NuxtLink>
-        <NuxtLink to="/games/snake" class="icon-button" title="贪吃蛇">🐍</NuxtLink>
-        <NuxtLink to="/games/minesweeper" class="icon-button" title="扫雷游戏">💣</NuxtLink>
-        <NuxtLink to="/games/plane" class="icon-button" title="飞机大战">✈️</NuxtLink>
-        <NuxtLink to="/games/tank" class="icon-button" title="坦克大战">🚗</NuxtLink>
-        <NuxtLink to="/games/typing" class="icon-button" title="打字挑战">⌨️</NuxtLink>
-        <NuxtLink to="/games/bottle" class="icon-button" title="漂流瓶">🍾</NuxtLink>
+        <NuxtLink to="/" class="icon-button" title="Home">🏠</NuxtLink>
+        <NuxtLink to="/games/fishing" class="icon-button" title="Deep Sea Fishing">🎣</NuxtLink>
+        <NuxtLink to="/games/snake" class="icon-button" title="Snake">🐍</NuxtLink>
+        <NuxtLink to="/games/minesweeper" class="icon-button" title="Minesweeper">💣</NuxtLink>
+        <NuxtLink to="/games/plane" class="icon-button" title="Plane Battle">✈️</NuxtLink>
+        <NuxtLink to="/games/tank" class="icon-button" title="Tank Battle">🚗</NuxtLink>
+        <NuxtLink to="/games/typing" class="icon-button" title="Typing Challenge">⌨️</NuxtLink>
+        <NuxtLink to="/games/bottle" class="icon-button" title="Message in a Bottle">🍾</NuxtLink>
       </div>
     </div>
 

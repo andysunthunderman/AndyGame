@@ -506,9 +506,9 @@ function gameLoop() {
     ctx.fillStyle = '#30cfd0'
     ctx.font = '48px Arial'
     ctx.textAlign = 'center'
-    ctx.fillText('暂停中', 600, 400)
+    ctx.fillText('Paused', 600, 400)
     ctx.font = '24px Arial'
-    ctx.fillText('点击继续按钮恢复游戏', 600, 450)
+    ctx.fillText('Click Continue to resume', 600, 450)
     ctx.textAlign = 'left'
   }
 
@@ -526,7 +526,7 @@ function endGame() {
   }
   
   // 记录游戏成绩
-  recordGameScore("飞机大战", score.value)
+  recordGameScore("Plane Battle", score.value)
   
   cancelAnimationFrame(gameLoopId)
 }
@@ -710,12 +710,12 @@ onUnmounted(() => {
   <div class="plane-game">
     <!-- HUD界面 -->
     <div class="hud">
-      <div>时间: <span>{{ gameTime }}</span>s</div>
-      <div>生命: <span>{{ lifePercent }}%</span></div>
-      <div>分数: <span>{{ score }}</span></div>
-      <div>最高分: <span>{{ highScore }}</span></div>
-      <div>弹药: <span>{{ player.reloading ? '换弹中...' : player.ammo }}</span></div>
-      <div>击败敌机: <span>{{ defeatedEnemies }}</span></div>
+      <div>Time: <span>{{ gameTime }}</span>s</div>
+      <div>Health: <span>{{ lifePercent }}%</span></div>
+      <div>Score: <span>{{ score }}</span></div>
+      <div>High Score: <span>{{ highScore }}</span></div>
+      <div>Ammo: <span>{{ player.reloading ? 'Reloading...' : player.ammo }}</span></div>
+      <div>Enemies Defeated: <span>{{ defeatedEnemies }}</span></div>
     </div>
 
     <!-- 生命值进度条 -->
@@ -725,14 +725,14 @@ onUnmounted(() => {
 
     <!-- 游戏结束界面 -->
     <div v-if="gameOver" class="game-over-screen">
-      <h1>游戏结束</h1>
-      <p>你的分数: <span>{{ score }}</span></p>
-      <button class="restart-btn" @click="restartGame">再来一次</button>
+      <h1>Game Over</h1>
+      <p>Your Score: <span>{{ score }}</span></p>
+      <button class="restart-btn" @click="restartGame">Play Again</button>
     </div>
 
     <!-- 暂停按钮 -->
     <button v-if="!gameOver" class="pause-btn" @click="togglePause">
-      {{ paused ? '继续' : '暂停' }}
+      {{ paused ? 'Continue' : 'Pause' }}
     </button>
 
     <!-- 触屏控制 -->
@@ -756,7 +756,7 @@ class="fire-btn"
            @touchstart.prevent="shoot" 
            @touchend.prevent="() => {}" 
            @touchmove.prevent="() => {}">
-        <span>发射</span>
+        <span>Fire</span>
       </div>
     </div>
 

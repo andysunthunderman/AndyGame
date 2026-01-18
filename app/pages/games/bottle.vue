@@ -12,7 +12,7 @@
           <textarea
             v-if="isWriting"
             v-model="bottleContent"
-            placeholder="写下你想说的话..."
+            placeholder="Write what you want to say..."
             :maxlength="500"
           />
           <div v-else class="message">{{ bottleContent }}</div>
@@ -24,13 +24,13 @@
             :disabled="!bottleContent.trim() || isLoading"
             @click="throwBottle"
           >
-            {{ isLoading ? '正在扔出...' : '扔出去' }}
+            {{ isLoading ? 'Throwing...' : 'Throw' }}
           </button>
           <template v-else>
-            <button :disabled="isLoading" @click="throwBack">扔回海里</button>
-            <button :disabled="isLoading" @click="closeBottle">关闭</button>
+            <button :disabled="isLoading" @click="throwBack">Throw Back</button>
+            <button :disabled="isLoading" @click="closeBottle">Close</button>
           </template>
-          <button :disabled="isLoading" @click="closeDialog">取消</button>
+          <button :disabled="isLoading" @click="closeDialog">Cancel</button>
         </div>
       </div>
     </div>
@@ -38,10 +38,10 @@
     <!-- 主按钮 -->
     <div class="main-buttons">
       <button class="pick-btn" :disabled="isLoading" @click="pickBottle">
-        {{ isLoading ? '正在打捞...' : '打捞漂流瓶' }}
+        {{ isLoading ? 'Picking up...' : 'Pick Bottle' }}
       </button>
       <button class="write-btn" :disabled="isLoading" @click="writeBottle">
-        {{ isLoading ? '准备中...' : '写漂流瓶' }}
+        {{ isLoading ? 'Preparing...' : 'Write Bottle' }}
       </button>
     </div>
 
@@ -85,7 +85,7 @@ function showError(message) {
 
 // 写漂流瓶
 function writeBottle() {
-  dialogTitle.value = '写一个漂流瓶'
+  dialogTitle.value = 'Write a Bottle'
   isWriting.value = true
   bottleContent.value = ''
   errorMessage.value = ''
@@ -105,15 +105,15 @@ async function pickBottle() {
     
     if (data.success) {
       bottleContent.value = data.content
-      dialogTitle.value = '你打捞到一个漂流瓶！'
+      dialogTitle.value = 'You picked up a bottle!'
       isWriting.value = false
       showBottleDialog.value = true
     } else {
-      showError(data.error || '打捞失败，请稍后再试')
+      showError(data.error || 'Failed to pick bottle, please try again')
     }
   } catch (error) {
     console.error('打捞失败:', error)
-    showError('网络错误，请稍后再试')
+    showError('Network error, please try again')
   } finally {
     isLoading.value = false
   }
@@ -139,14 +139,14 @@ async function throwBottle() {
     const data = await response.json()
     
     if (data.success) {
-      showSuccess('漂流瓶已扔出！')
+      showSuccess('Bottle thrown!')
       closeDialog()
     } else {
-      showError(data.error || '投掷失败，请稍后再试')
+      showError(data.error || 'Failed to throw bottle, please try again')
     }
   } catch (error) {
     console.error('投掷失败:', error)
-    showError('网络错误，请稍后再试')
+    showError('Network error, please try again')
   } finally {
     isLoading.value = false
   }
@@ -172,14 +172,14 @@ async function throwBack() {
     const data = await response.json()
     
     if (data.success) {
-      showSuccess('漂流瓶已扔回海里')
+      showSuccess('Bottle thrown back into the sea')
       closeDialog()
     } else {
-      showError(data.error || '操作失败，请稍后再试')
+      showError(data.error || 'Operation failed, please try again')
     }
   } catch (error) {
     console.error('扔回失败:', error)
-    showError('网络错误，请稍后再试')
+    showError('Network error, please try again')
   } finally {
     isLoading.value = false
   }
@@ -207,11 +207,11 @@ async function closeBottle() {
     if (data.success) {
       closeDialog()
     } else {
-      showError(data.error || '操作失败，请稍后再试')
+      showError(data.error || 'Operation failed, please try again')
     }
   } catch (error) {
     console.error('关闭失败:', error)
-    showError('网络错误，请稍后再试')
+    showError('Network error, please try again')
   } finally {
     isLoading.value = false
   }

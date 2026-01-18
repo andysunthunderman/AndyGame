@@ -152,9 +152,9 @@ const gameOver = () => {
   gameRunning.value = false
   
   // 记录成绩
-  recordGameScore('贪吃蛇', score.value)
+  recordGameScore('Snake', score.value)
   
-  const result = confirm(`游戏结束！\n最终得分：${score.value}\n\n点击确定重新开始，取消返回主页`)
+  const result = confirm(`Game Over!\nFinal Score: ${score.value}\n\nClick OK to restart, Cancel to return to homepage`)
   if (result) {
     startGame()
   } else {
@@ -290,10 +290,10 @@ onUnmounted(() => {
 
 
     <div class="game-container">
-      <h1 class="game-title">贪吃蛇游戏</h1>
+      <h1 class="game-title">Snake Game</h1>
       
       <div class="score-display">
-        分数: <span class="score-value">{{ score }}</span>
+        Score: <span class="score-value">{{ score }}</span>
       </div>
       
       <canvas 
@@ -308,19 +308,19 @@ onUnmounted(() => {
           class="control-button start-button" 
           @click="startGame"
         >
-          {{ gameRunning ? '重新开始' : '开始游戏' }}
+          {{ gameRunning ? 'Restart' : 'Start Game' }}
         </button>
         <button 
           class="control-button pause-button" 
           :disabled="!gameRunning"
           @click="pauseGame"
         >
-          {{ isPaused ? '继续' : '暂停' }}
+          {{ isPaused ? 'Continue' : 'Pause' }}
         </button>
       </div>
       
       <div class="instructions">
-        <p>使用方向键或WASD键控制蛇的移动</p>
+        <p>Use arrow keys or WASD keys to control the snake</p>
         <div class="arrow-keys">
           <div class="arrow-row">
             <div class="arrow-key">↑</div>

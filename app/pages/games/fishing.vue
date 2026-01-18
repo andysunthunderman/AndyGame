@@ -254,9 +254,9 @@ const endGame = () => {
   }
   
   // 记录成绩
-  recordGameScore('深海捕鱼', score.value)
+  recordGameScore('Deep Sea Fishing', score.value)
   
-  const result = confirm(`游戏结束！\n最终得分：${score.value}\n\n点击确定重新开始，取消返回主页`)
+  const result = confirm(`Game Over!\nFinal Score: ${score.value}\n\nClick OK to restart, Cancel to return to homepage`)
   if (result) {
     startGame()
   } else {
@@ -328,18 +328,18 @@ onUnmounted(() => {
     
     <!-- 游戏UI -->
     <div class="game-ui">
-      <div class="score-display">分数: {{ score }}</div>
-      <div class="timer-display">时间: {{ timeLeft }}秒</div>
+      <div class="score-display">Score: {{ score }}</div>
+      <div class="timer-display">Time: {{ timeLeft }}s</div>
     </div>
     
 
     
     <!-- 游戏说明 -->
     <div class="instructions">
-      <p>移动鼠标控制捕鱼器位置</p>
-      <p>按住鼠标左键伸出钓鱼线</p>
-      <p>松开鼠标左键收回钓鱼线</p>
-      <p>钓到鱼可以获得分数！</p>
+      <p>Move mouse to control fishing device position</p>
+      <p>Hold left mouse button to extend fishing line</p>
+      <p>Release left mouse button to retract fishing line</p>
+      <p>Catch fish to earn points!</p>
     </div>
   </div>
 </template>
